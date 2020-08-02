@@ -25,6 +25,10 @@ def init_db():
   print('Nothing is implemented')
 
 
+def percentage():
+  print('A function summarizing the percentage of women / men in the database')
+
+
 def main():
   results = []
   args = init_argparser()
@@ -35,7 +39,6 @@ def main():
 
   # for r in results:
   #   print(r)  
-
   print(args.operation)
 
 
