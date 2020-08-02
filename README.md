@@ -48,7 +48,7 @@ Available commands:
 
 * Python 3.7
 
-* SQligth 3
+* SQLite
 
   
 
