@@ -24,11 +24,13 @@ This project help you in easy way to pull up information about users in your dat
 
   
 
-Available commands:
+*Available commands:*
 
-* **python script/main.py percentage <female | male>** , returns percent of female or male in the database,
+* **python script/main.py init --file**, initializing database,
 
-* **python script/main.py average-age [female | male]**, returns the average age of female or male, without a parameter, returns the average age of people in the database,
+* **python script/main.py percentage --gender=<female | male>** , returns percent of female or male in the database,
+
+* **python script/main.py average-age --gender=[female | male]**, returns the average age of female or male, without a parameter, returns the average age of people in the database,
 
 * **python script/main.py most-popular-cities --num=<N>**, returns the N most popular cities where users live,
 
