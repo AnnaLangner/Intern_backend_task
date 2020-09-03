@@ -27,4 +27,4 @@ bin/
 venv/
 
 #bd
-bd/
+db/
