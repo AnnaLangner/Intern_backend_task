@@ -2,7 +2,6 @@
 import argparse
 import json 
 import sqlite3
-from sqlite3 import Error
 
 
 JSON_FILE = "init\persons.json"
@@ -32,7 +31,7 @@ def init_db():
   conn = None
   try:
     conn = sqlite3.connect("db/db_file.db")
-  except Error as e:
+  except sqlite3.Error as e:
     print(e)
 
   cursor = conn.cursor()
