@@ -25,57 +25,89 @@ def init_argparser():
   return args
 
 
-def init_db():  
-  '''Initializing the database'''  
-    
+def create_connection(db_file):
   conn = None
   try:
-    conn = sqlite3.connect("db/db_file.db")
+    conn = sqlite3.connect(db_file)
   except sqlite3.Error as e:
     print(e)
+  
+  return conn
 
-  cursor = conn.cursor()
-  cursor.execute('DROP TABLE IF EXISTS USERS')
-  sql_users_table = """ CREATE TABLE USERS (
-    GENDER,
-    NAME_TITLE,
-    NAME_FIRST CHAR(20) NOT NULL,
-    NAME_LAST CHAR(20),
-    LOCATION_STREET_NUMBER,
-    LOCATION_STREET_NAME,
-    LOCATION_CITY,
-    LOCATION_STATE,
-    LOCATION_COUNTRY,
-    LOCATION_POSTCODE,
-    LOCATION_COORDINATES_LATITUDE,
-    LOCATION_COORDINATES_LONGITUDE,
-    LOCATION_TIMEZONE_OFFSET,
-    LOCATION_TIMEZONE_DESCRIPTION,
-    EMAIL,
-    LOGIN_UUID,
-    LOGIN_USERNAME,
-    LOGIN_PASSWORD,
-    LOGIN_SALT,
-    LOGIN_MD5,
-    LOGIN_SHA1,
-    LOGIN_SHA256,
-    DOB_DATE,
-    DOB_AGE,
-    REGISTERED_DATE,
-    REGISTERED_AGE,
-    PHONE,
-    CELL,
-    ID_NAME,
-    ID_VALUE,
-    PICTURE_LARGE,
-    PICTURE_MEDIUM
-    PICTURE_THUMBNAIL,
-    NAT
+
+def create_table(conn, create_table_sql):
+  try:
+    cursor = conn.cursor()
+    cursor.execute(create_table_sql)
+  except sqlite3.Error as e:
+    print(e)  
+
+
+def create_user(conn, users):
+  sql = ''' INSERT INTO users(
+    NAME_FIRST
+  ) 
+    VALUES(?) '''
+  cur = conn.cursor()
+  cur.execute(sql, (users,))
+  conn.commit()
+  return cur.lastrowid
+
+
+def init_db():  
+  '''Initializing the database'''  
+
+  database = "db/pythonsqliteusers.db"
+  
+  sql_create_users_table = """ CREATE TABLE IF NOT EXISTS users (
+    GENDER text,
+    NAME_TITLE text,
+    NAME_FIRST text NOT NULL,
+    NAME_LAST text,
+    LOCATION_STREET_NUMBER integer,
+    LOCATION_STREET_NAME text,
+    LOCATION_CITY text,
+    LOCATION_STATE text,
+    LOCATION_COUNTRY text,
+    LOCATION_POSTCODE integer,
+    LOCATION_COORDINATES_LATITUDE numeric,
+    LOCATION_COORDINATES_LONGITUDE numeric,
+    LOCATION_TIMEZONE_OFFSET numeric,
+    LOCATION_TIMEZONE_DESCRIPTION text,
+    EMAIL text,
+    LOGIN_UUID text,
+    LOGIN_USERNAME text,
+    LOGIN_PASSWORD text,
+    LOGIN_SALT text,
+    LOGIN_MD5 text,
+    LOGIN_SHA1 text,
+    LOGIN_SHA256 text,
+    DOB_DATE text,
+    DOB_AGE text,
+    REGISTERED_DATE text,
+    REGISTERED_AGE text,
+    PHONE text,
+    CELL text,
+    ID_NAME text,
+    ID_VALUE text,
+    PICTURE_LARGE text,
+    PICTURE_MEDIUM text,
+    PICTURE_THUMBNAIL text,
+    NAT text
   ); """
 
-  cursor.execute(sql_users_table)
-  conn.commit()
-  conn.close()
+  conn = create_connection(database)
+
+  #create table
+  if conn is not None:
+    create_table(conn, sql_create_users_table)
+  else:
+    print("Error! cannot create the database connection.")
+  
+  #create users
+  with conn:
+    user = ('Anna');
+    user_id = create_user(conn, user)
 
 
 def percentage():
