@@ -4,7 +4,7 @@ import json
 import sqlite3
 
 
-JSON_FILE = "init\persons.json"
+JSON_FILE = "init\person-test.json"
 persons =  json.load(open(JSON_FILE, encoding='utf-8'))
 
 
@@ -44,14 +44,10 @@ def create_table(conn, create_table_sql):
 
 
 def create_user(conn, users):
-  sql = ''' INSERT INTO users(
-    NAME_FIRST
-  ) 
-    VALUES(?) '''
   cur = conn.cursor()
-  cur.execute(sql, (users,))
+  cur.execute('''INSERT INTO users VALUES (?)''',
+    (json.dumps(persons),))
   conn.commit()
-  return cur.lastrowid
 
 
 def init_db():  
@@ -59,42 +55,9 @@ def init_db():
 
   database = "db/pythonsqliteusers.db"
   
-  sql_create_users_table = """ CREATE TABLE IF NOT EXISTS users (
-    GENDER text,
-    NAME_TITLE text,
-    NAME_FIRST text NOT NULL,
-    NAME_LAST text,
-    LOCATION_STREET_NUMBER integer,
-    LOCATION_STREET_NAME text,
-    LOCATION_CITY text,
-    LOCATION_STATE text,
-    LOCATION_COUNTRY text,
-    LOCATION_POSTCODE integer,
-    LOCATION_COORDINATES_LATITUDE numeric,
-    LOCATION_COORDINATES_LONGITUDE numeric,
-    LOCATION_TIMEZONE_OFFSET numeric,
-    LOCATION_TIMEZONE_DESCRIPTION text,
-    EMAIL text,
-    LOGIN_UUID text,
-    LOGIN_USERNAME text,
-    LOGIN_PASSWORD text,
-    LOGIN_SALT text,
-    LOGIN_MD5 text,
-    LOGIN_SHA1 text,
-    LOGIN_SHA256 text,
-    DOB_DATE text,
-    DOB_AGE text,
-    REGISTERED_DATE text,
-    REGISTERED_AGE text,
-    PHONE text,
-    CELL text,
-    ID_NAME text,
-    ID_VALUE text,
-    PICTURE_LARGE text,
-    PICTURE_MEDIUM text,
-    PICTURE_THUMBNAIL text,
-    NAT text
-  ); """
+  sql_create_users_table = ''' CREATE TABLE IF NOT EXISTS users (
+    data json
+  ); '''
 
   conn = create_connection(database)
 
@@ -104,11 +67,10 @@ def init_db():
   else:
     print("Error! cannot create the database connection.")
   
-  #create users
   with conn:
-    user = ('Anna');
+    user = (persons);
     user_id = create_user(conn, user)
-
+    
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
@@ -125,6 +87,5 @@ def main():
   # for r in results:
   #   print(r)  
   print(args.operation)
-
 
 main()
