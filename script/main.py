@@ -5,7 +5,28 @@ import sqlite3
 
 
 JSON_FILE = "init\person-test.json"
-persons =  json.load(open(JSON_FILE, encoding='utf-8'))
+unflat_persons =  json.load(open(JSON_FILE, encoding='utf-8'))
+
+
+def flatten_persons(data):
+  out = {}
+
+  def flatten(item, name = ''):
+    if type(item) is dict:
+      for x in item:
+        flatten(item[x], name + x + '_')
+    elif type(item) is list:
+      i = 0
+      for x in item:
+        flatten(x, name + str(i) + '_')
+    else:
+      out[name[:-1]] = item
+
+  flatten(data)
+  return out
+
+
+persons = flatten_persons(unflat_persons)
 
 
 def init_argparser():
@@ -43,6 +64,14 @@ def create_table(conn, create_table_sql):
     print(e)  
 
 
+def delete_table(conn):
+    sql = 'DROP TABLE users'
+    cur = conn.cursor()
+    cur.execute(sql)
+    print("Table dropped... ")
+    conn.commit()
+
+
 def create_user(conn, users):
   cur = conn.cursor()
   cur.execute('''INSERT INTO users VALUES (?)''',
@@ -59,7 +88,7 @@ def init_db():
     data json
   ); '''
 
-  conn = create_connection(database)
+  conn = create_connection(database)  
 
   #create table
   if conn is not None:
@@ -70,7 +99,7 @@ def init_db():
   with conn:
     user = (persons);
     user_id = create_user(conn, user)
-    
+    # delete_table(conn)
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
@@ -87,5 +116,6 @@ def main():
   # for r in results:
   #   print(r)  
   print(args.operation)
+
 
 main()
