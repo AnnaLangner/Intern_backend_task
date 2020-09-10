@@ -73,9 +73,46 @@ def delete_table(conn):
 
 
 def create_user(conn, users):
+  sql = '''INSERT INTO users (
+    GENDER,
+    NAME_TITLE,
+    NAME_FIRST,
+    NAME_LAST,
+    LOCATION_STREET_NUMBER,
+    LOCATION_STREET_NAME,
+    LOCATION_CITY,
+    LOCATION_STATE,
+    LOCATION_COUNTRY,
+    LOCATION_POSTCODE,
+    LOCATION_COORDINATES_LATITUDE,
+    LOCATION_COORDINATES_LONGITUDE,
+    LOCATION_TIMEZONE_OFFSET,
+    LOCATION_TIMEZONE_DESCRIPTION,
+    EMAIL,
+    LOGIN_UUID,
+    LOGIN_USERNAME,
+    LOGIN_PASSWORD,
+    LOGIN_SALT,
+    LOGIN_MD5,
+    LOGIN_SHA1,
+    LOGIN_SHA256,
+    DOB_DATE,
+    DOB_AGE,
+    REGISTERED_DATE,
+    REGISTERED_AGE,
+    PHONE,
+    CELL,
+    ID_NAME,
+    ID_VALUE,
+    PICTURE_LARGE,
+    PICTURE_MEDIUM,
+    PICTURE_THUMBNAIL,
+    NAT
+  ) 
+  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+ 
   cur = conn.cursor()
-  cur.execute('''INSERT INTO users VALUES (?)''',
-    (json.dumps(persons),))
+  cur.execute(sql, users)
   conn.commit()
 
 
@@ -85,12 +122,45 @@ def init_db():
   database = "db/pythonsqliteusers.db"
   
   sql_create_users_table = ''' CREATE TABLE IF NOT EXISTS users (
-    data json
+    GENDER text,
+    NAME_TITLE text,
+    NAME_FIRST text NOT NULL,
+    NAME_LAST text,
+    LOCATION_STREET_NUMBER integer,
+    LOCATION_STREET_NAME text,
+    LOCATION_CITY text,
+    LOCATION_STATE text,
+    LOCATION_COUNTRY text,
+    LOCATION_POSTCODE integer,
+    LOCATION_COORDINATES_LATITUDE numeric,
+    LOCATION_COORDINATES_LONGITUDE numeric,
+    LOCATION_TIMEZONE_OFFSET numeric,
+    LOCATION_TIMEZONE_DESCRIPTION text,
+    EMAIL text,
+    LOGIN_UUID text,
+    LOGIN_USERNAME text,
+    LOGIN_PASSWORD text,
+    LOGIN_SALT text,
+    LOGIN_MD5 text,
+    LOGIN_SHA1 text,
+    LOGIN_SHA256 text,
+    DOB_DATE text,
+    DOB_AGE text,
+    REGISTERED_DATE text,
+    REGISTERED_AGE text,
+    PHONE text,
+    CELL text,
+    ID_NAME text,
+    ID_VALUE text,
+    PICTURE_LARGE text,
+    PICTURE_MEDIUM text,
+    PICTURE_THUMBNAIL text,
+    NAT text
   ); '''
 
   conn = create_connection(database)  
 
-  #create table
+  # create table
   if conn is not None:
     create_table(conn, sql_create_users_table)
   else:
