@@ -80,7 +80,7 @@ def create_user(conn, users):
   VALUES (?,?)'''
  
   cur = conn.cursor()
-  cur.execute(sql, json.dumps(users,))
+  cur.execute(sql, ('persons', 'persons',))
   conn.commit()
 
 
@@ -90,39 +90,39 @@ def init_db():
   database = "db/pythonsqliteusers.db"
   
   sql_create_users_table = ''' CREATE TABLE IF NOT EXISTS users (
-    gender,
-    name_title,
-    name_first,
-    name_last,
-    location_street_number,
-    location_street_name,
-    location_city,
-    location_state,
-    location_country,
-    location_postcode,
-    location_coordinates_latitude,
-    location_coordinates_longitude,
-    location_timezone_offset,
-    location_timezone_description,
-    email,
-    login_uuid,
-    login_username,
-    login_password,
-    login_salt,
-    login_md5,
-    login_sha1,
-    login_sha256,
-    dob_date,
-    dob_age,
-    registered_date,
-    registered_age,
-    phone,
-    cell,
-    id_name,
-    id_value,
-    picture_large,
-    picture_medium,
-    picture_thumbnail,
+    gender text,
+    name_title text,
+    name_first text,
+    name_last text,
+    location_street_number integer,
+    location_street_name text,
+    location_city text,
+    location_state text,
+    location_country text,
+    location_postcode integer,
+    location_coordinates_latitude numeric,
+    location_coordinates_longitude numeric,
+    location_timezone_offset numeric,
+    location_timezone_description text,
+    email text,
+    login_uuid text,
+    login_username text,
+    login_password text,
+    login_salt text,
+    login_md5 text,
+    login_sha1 text,
+    login_sha256 text,
+    dob_date text,
+    dob_age text,
+    registered_date text,
+    registered_age text,
+    phone text,
+    cell text,
+    id_name text,
+    id_value text,
+    picture_large text,
+    picture_medium text,
+    picture_thumbnail text,
     nat
   ); '''
 
@@ -135,8 +135,8 @@ def init_db():
     print("Error! cannot create the database connection.")
   
   with conn:
-    user = (persons);
-    user_id = create_user(conn, user)
+    users = (persons);
+    user_id = create_user(conn, users)
     # delete_table(conn)
 
 def percentage():
