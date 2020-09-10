@@ -74,45 +74,13 @@ def delete_table(conn):
 
 def create_user(conn, users):
   sql = '''INSERT INTO users (
-    GENDER,
-    NAME_TITLE,
-    NAME_FIRST,
-    NAME_LAST,
-    LOCATION_STREET_NUMBER,
-    LOCATION_STREET_NAME,
-    LOCATION_CITY,
-    LOCATION_STATE,
-    LOCATION_COUNTRY,
-    LOCATION_POSTCODE,
-    LOCATION_COORDINATES_LATITUDE,
-    LOCATION_COORDINATES_LONGITUDE,
-    LOCATION_TIMEZONE_OFFSET,
-    LOCATION_TIMEZONE_DESCRIPTION,
-    EMAIL,
-    LOGIN_UUID,
-    LOGIN_USERNAME,
-    LOGIN_PASSWORD,
-    LOGIN_SALT,
-    LOGIN_MD5,
-    LOGIN_SHA1,
-    LOGIN_SHA256,
-    DOB_DATE,
-    DOB_AGE,
-    REGISTERED_DATE,
-    REGISTERED_AGE,
-    PHONE,
-    CELL,
-    ID_NAME,
-    ID_VALUE,
-    PICTURE_LARGE,
-    PICTURE_MEDIUM,
-    PICTURE_THUMBNAIL,
-    NAT
+    name_first,
+    name_last
   ) 
-  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+  VALUES (?,?)'''
  
   cur = conn.cursor()
-  cur.execute(sql, users)
+  cur.execute(sql, json.dumps(users,))
   conn.commit()
 
 
@@ -122,40 +90,40 @@ def init_db():
   database = "db/pythonsqliteusers.db"
   
   sql_create_users_table = ''' CREATE TABLE IF NOT EXISTS users (
-    GENDER text,
-    NAME_TITLE text,
-    NAME_FIRST text NOT NULL,
-    NAME_LAST text,
-    LOCATION_STREET_NUMBER integer,
-    LOCATION_STREET_NAME text,
-    LOCATION_CITY text,
-    LOCATION_STATE text,
-    LOCATION_COUNTRY text,
-    LOCATION_POSTCODE integer,
-    LOCATION_COORDINATES_LATITUDE numeric,
-    LOCATION_COORDINATES_LONGITUDE numeric,
-    LOCATION_TIMEZONE_OFFSET numeric,
-    LOCATION_TIMEZONE_DESCRIPTION text,
-    EMAIL text,
-    LOGIN_UUID text,
-    LOGIN_USERNAME text,
-    LOGIN_PASSWORD text,
-    LOGIN_SALT text,
-    LOGIN_MD5 text,
-    LOGIN_SHA1 text,
-    LOGIN_SHA256 text,
-    DOB_DATE text,
-    DOB_AGE text,
-    REGISTERED_DATE text,
-    REGISTERED_AGE text,
-    PHONE text,
-    CELL text,
-    ID_NAME text,
-    ID_VALUE text,
-    PICTURE_LARGE text,
-    PICTURE_MEDIUM text,
-    PICTURE_THUMBNAIL text,
-    NAT text
+    gender,
+    name_title,
+    name_first,
+    name_last,
+    location_street_number,
+    location_street_name,
+    location_city,
+    location_state,
+    location_country,
+    location_postcode,
+    location_coordinates_latitude,
+    location_coordinates_longitude,
+    location_timezone_offset,
+    location_timezone_description,
+    email,
+    login_uuid,
+    login_username,
+    login_password,
+    login_salt,
+    login_md5,
+    login_sha1,
+    login_sha256,
+    dob_date,
+    dob_age,
+    registered_date,
+    registered_age,
+    phone,
+    cell,
+    id_name,
+    id_value,
+    picture_large,
+    picture_medium,
+    picture_thumbnail,
+    nat
   ); '''
 
   conn = create_connection(database)  
@@ -186,6 +154,5 @@ def main():
   # for r in results:
   #   print(r)  
   print(args.operation)
-
 
 main()
