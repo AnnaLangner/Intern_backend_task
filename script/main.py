@@ -120,10 +120,12 @@ def create_user(conn, users):
     'nat'
   ]
   
-  for keys, data in enumerate(persons):   
-    keys = (keys,) + tuple(data[c] for c in columns)
+  for records, data in enumerate(persons):   
+    keys = (records,) + tuple(data[c] for c in columns)
+    print("keys", data)
+    print("value", str(keys))
   cur = conn.cursor()
-  cur.execute(sql, (keys,))
+  cur.execute(sql, str(keys,))
   conn.commit()
 
 
