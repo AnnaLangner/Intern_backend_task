@@ -8,25 +8,27 @@ JSON_FILE = "init\person-test.json"
 unflat_persons =  json.load(open(JSON_FILE, encoding='utf-8'))
 
 
-def flatten_persons(data):
-  out = {}
+def flatten_persons():    
+  tab =[]
+  for data in unflat_persons['results']:
+    out = {}
+    def flatten(item, name = ''):    
+      if type(item) is dict:
+        for x in item:
+          flatten(item[x], name + x + '_')
+      elif type(item) is list:
+        i = 0
+        for x in item:
+          flatten(x, name + str(i) + '_')
+      else:
+        out[name[:-1]] = item
+    flatten(data)
+    tab.append(out)
 
-  def flatten(item, name = ''):
-    if type(item) is dict:
-      for x in item:
-        flatten(item[x], name + x + '_')
-    elif type(item) is list:
-      i = 0
-      for x in item:
-        flatten(x, name + str(i) + '_')
-    else:
-      out[name[:-1]] = item
-
-  flatten(data)
-  return out
+  return tab
 
 
-persons = flatten_persons(unflat_persons)
+persons = flatten_persons()
 
 
 def init_argparser():
@@ -64,6 +66,13 @@ def create_table(conn, create_table_sql):
     print(e)  
 
 
+def delete_all_users(conn):
+    sql = 'DELETE FROM users'
+    cur = conn.cursor()
+    cur.execute(sql)
+    conn.commit()
+
+
 def delete_table(conn):
     sql = 'DROP TABLE users'
     cur = conn.cursor()
@@ -73,14 +82,48 @@ def delete_table(conn):
 
 
 def create_user(conn, users):
-  sql = '''INSERT INTO users (
-    name_first,
-    name_last
-  ) 
-  VALUES (?,?)'''
- 
+  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+  columns = [
+    'gender',
+    'name_title',
+    'name_first',
+    'name_last',
+    'location_street_number',
+    'location_street_name',
+    'location_city',
+    'location_state',
+    'location_country',
+    'location_postcode',
+    'location_coordinates_latitude',
+    'location_coordinates_longitude',
+    'location_timezone_offset',
+    'location_timezone_description',
+    'email',
+    'login_uuid',
+    'login_username',
+    'login_password',
+    'login_salt',
+    'login_md5',
+    'login_sha1',
+    'login_sha256',
+    'dob_date',
+    'dob_age',
+    'registered_date',
+    'registered_age',
+    'phone',
+    'cell',
+    'id_name',
+    'id_value',
+    'picture_large',
+    'picture_medium',
+    'picture_thumbnail',
+    'nat'
+  ]
+  
+  for keys, data in enumerate(persons):   
+    keys = (keys,) + tuple(data[c] for c in columns)
   cur = conn.cursor()
-  cur.execute(sql, ('persons', 'persons',))
+  cur.execute(sql, (keys,))
   conn.commit()
 
 
@@ -134,10 +177,10 @@ def init_db():
   else:
     print("Error! cannot create the database connection.")
   
-  with conn:
-    users = (persons);
-    user_id = create_user(conn, users)
+  with conn:        
+    user_id = create_user(conn, persons)
     # delete_table(conn)
+    # delete_all_users(conn)
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
@@ -154,5 +197,11 @@ def main():
   # for r in results:
   #   print(r)  
   print(args.operation)
+  # print(persons)
+  # for data in persons:
+  #   print(data['name_first'])
+  #   print(data['name_last'])
+    
+  # print(len(persons))
 
 main()
