@@ -4,31 +4,87 @@ import json
 import sqlite3
 
 
-JSON_FILE = "init\person-test.json"
-unflat_persons =  json.load(open(JSON_FILE, encoding='utf-8'))
+JSON_FILE = "init\persons.json"
+unflat_people =  json.load(open(JSON_FILE, encoding='utf-8'))
 
 
-def flatten_persons():    
-  tab =[]
-  for data in unflat_persons['results']:
-    out = {}
-    def flatten(item, name = ''):    
-      if type(item) is dict:
-        for x in item:
-          flatten(item[x], name + x + '_')
-      elif type(item) is list:
-        i = 0
-        for x in item:
-          flatten(x, name + str(i) + '_')
-      else:
-        out[name[:-1]] = item
-    flatten(data)
-    tab.append(out)
+people = []
 
-  return tab
+list_of_people = unflat_people['results']
+for dict_of_person in list_of_people:   
+  gender = dict_of_person['gender']
+  name_title = dict_of_person['name']['title']
+  name_first = dict_of_person['name']['first']
+  name_last = dict_of_person['name']['last']
+  location_street_number = dict_of_person['location']['street']['number']
+  location_street_name = dict_of_person['location']['street']['name']
+  location_city = dict_of_person['location']['city']
+  location_state = dict_of_person['location']['state']
+  location_country = dict_of_person['location']['country']
+  location_postcode = dict_of_person['location']['postcode']
+  location_coordinates_latitude = dict_of_person['location']['coordinates']['latitude']
+  location_coordinates_longitude = dict_of_person['location']['coordinates']['longitude']
+  location_timezone_offset = dict_of_person['location']['timezone']['offset']
+  location_timezone_description = dict_of_person['location']['timezone']['description']
+  email = dict_of_person['email']
+  login_uuid = dict_of_person['login']['uuid']
+  login_username = dict_of_person['login']['username']
+  login_password = dict_of_person['login']['password']
+  login_salt = dict_of_person['login']['salt']
+  login_md5 = dict_of_person['login']['md5']
+  login_sha1 = dict_of_person['login']['sha1']
+  login_sha256 = dict_of_person['login']['sha256']
+  dob_date = dict_of_person['dob']['date']
+  dob_age = dict_of_person['dob']['age']
+  registered_date = dict_of_person['registered']['date']
+  registered_age = dict_of_person['registered']['age']
+  phone = dict_of_person['phone']
+  cell = dict_of_person['cell']
+  id_name = dict_of_person['id']['name']
+  id_value = dict_of_person['id']['value']
+  picture_large = dict_of_person['picture']['large']
+  picture_medium = dict_of_person['picture']['medium']
+  picture_thumbnail = dict_of_person['picture']['thumbnail']
+  nat = dict_of_person['nat']
+  columns = [
+    gender,
+    name_title,
+    name_first,
+    name_last,
+    location_street_number,
+    location_street_name,
+    location_city,
+    location_state,
+    location_country,
+    location_postcode,
+    location_coordinates_latitude,
+    location_coordinates_longitude,
+    location_timezone_offset,
+    location_timezone_description,
+    email,
+    login_uuid,
+    login_username,
+    login_password,
+    login_salt,
+    login_md5,
+    login_sha1,
+    login_sha256,
+    dob_date,
+    dob_age,
+    registered_date,
+    registered_age,
+    phone,
+    cell,
+    id_name,
+    id_value,
+    picture_large,
+    picture_medium,
+    picture_thumbnail,
+    nat
+  ]
 
+  people.append(columns)
 
-persons = flatten_persons()
 
 
 def init_argparser():
@@ -83,49 +139,9 @@ def delete_table(conn):
 
 def create_user(conn, users):
   sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
-  columns = [
-    'gender',
-    'name_title',
-    'name_first',
-    'name_last',
-    'location_street_number',
-    'location_street_name',
-    'location_city',
-    'location_state',
-    'location_country',
-    'location_postcode',
-    'location_coordinates_latitude',
-    'location_coordinates_longitude',
-    'location_timezone_offset',
-    'location_timezone_description',
-    'email',
-    'login_uuid',
-    'login_username',
-    'login_password',
-    'login_salt',
-    'login_md5',
-    'login_sha1',
-    'login_sha256',
-    'dob_date',
-    'dob_age',
-    'registered_date',
-    'registered_age',
-    'phone',
-    'cell',
-    'id_name',
-    'id_value',
-    'picture_large',
-    'picture_medium',
-    'picture_thumbnail',
-    'nat'
-  ]
-  
-  for records, data in enumerate(persons):   
-    keys = (records,) + tuple(data[c] for c in columns)
-    print("keys", data)
-    print("value", str(keys))
   cur = conn.cursor()
-  cur.execute(sql, str(keys,))
+  for columns in people:
+    cur.execute(sql, columns)  
   conn.commit()
 
 
@@ -179,8 +195,44 @@ def init_db():
   else:
     print("Error! cannot create the database connection.")
   
-  with conn:        
-    user_id = create_user(conn, persons)
+  with conn:     
+    person = (
+      gender,
+      name_title,
+      name_first,
+      name_last,
+      location_street_number,
+      location_street_name,
+      location_city,
+      location_state,
+      location_country,
+      location_postcode,
+      location_coordinates_latitude,
+      location_coordinates_longitude,
+      location_timezone_offset,
+      location_timezone_description,
+      email,
+      login_uuid,
+      login_username,
+      login_password,
+      login_salt,
+      login_md5,
+      login_sha1,
+      login_sha256,
+      dob_date,
+      dob_age,
+      registered_date,
+      registered_age,
+      phone,
+      cell,
+      id_name,
+      id_value,
+      picture_large,
+      picture_medium,
+      picture_thumbnail,
+      nat
+    )
+    user_id = create_user(conn, person)
     # delete_table(conn)
     # delete_all_users(conn)
 
@@ -199,11 +251,6 @@ def main():
   # for r in results:
   #   print(r)  
   print(args.operation)
-  # print(persons)
-  # for data in persons:
-  #   print(data['name_first'])
-  #   print(data['name_last'])
-    
-  # print(len(persons))
+  print(len(people))
 
 main()
