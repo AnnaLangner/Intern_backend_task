@@ -26,5 +26,5 @@ node_modules
 bin/
 venv/
 
-#bd
-bd/
+#db
+db/
