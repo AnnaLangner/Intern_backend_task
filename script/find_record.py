@@ -17,11 +17,11 @@ def find_users_by_name(first_name):
     first_name = dict_of_person['name']['first']
     last_name = dict_of_person['name']['last']
     if first_name == user_name:
-      user_list.append((gender, title, first_name, last_name))
+      user_list.append('%s %s %s %s' % (gender, title, first_name, last_name))
   return user_list
 
 
-def print_user_names(users):  
+def print_users(users):  
   if users == []:
      print('A user with this name does not exist')
   else:
@@ -30,7 +30,7 @@ def print_user_names(users):
 
 def main():
   users = find_users_by_name(user_name)
-  print_user_names(users)
+  print_users(users)
 
 
 main()
