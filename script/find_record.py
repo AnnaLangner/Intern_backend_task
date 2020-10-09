@@ -25,12 +25,10 @@ def print_users(users):
   if users == []:
      print('A user with this name does not exist')
   else:
-    record_num = 0
     print(' # | gender     | title      | first_name | last_name  |')
     print('----------------------------------------------------------')
-    for item in users:   
-      record_num += 1  
-      print(f' {record_num} | {item[0]:10} | {item[1]:10} | {item[2]:10} | {item[3]:10} |')
+    for i, user in enumerate(users, 1):   
+      print(f' {i} | {user[0]:10} | {user[1]:10} | {user[2]:10} | {user[3]:10} |')
       print('----------------------------------------------------------')
     
 
