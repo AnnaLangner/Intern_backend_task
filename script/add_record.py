@@ -13,7 +13,7 @@ def find_record_with_dob():
   return record_names
 
 
-def create_new_record_in_dob(records):
+def create_new_record_with_dob_in_json(records):
   for record in records:
     days_left = 0
     born = record['dob']['date']
@@ -24,13 +24,13 @@ def create_new_record_in_dob(records):
       days_left = (365-today)+birthday_day
     else:
       days_left = birthday_day - today    
-    dob_new_record = {"time_until_birthday": str(days_left)}
-    record["dob"].update(dob_new_record)
+    dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
+    record["dob"].update(dob_new_record_time_until_birthday)
  
 
 def main():
   records = find_record_with_dob()
-  create_new_record_in_dob(records)  
+  create_new_record_with_dob_in_json(records)  
 
 
 main()
