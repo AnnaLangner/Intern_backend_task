@@ -14,7 +14,7 @@ def find_record_with_picture():
   return record_names
 
 
-def remove_record_from_json(records):
+def remove_record_with_picture_from_json(records):
   for record in records:
     del record['picture']
   
@@ -22,8 +22,7 @@ def remove_record_from_json(records):
 
 def main():
   records = find_record_with_picture()
-  remove_record_from_json(records)
+  remove_record_with_picture_from_json(records)
 
 
 main()
-print(persons)
