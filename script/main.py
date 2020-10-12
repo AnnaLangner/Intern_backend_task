@@ -122,22 +122,7 @@ def create_table(conn, create_table_sql):
     print(e)  
 
 
-def delete_all_users(conn):
-    sql = 'DELETE FROM users'
-    cur = conn.cursor()
-    cur.execute(sql)
-    conn.commit()
-
-
-def delete_table(conn):
-    sql = 'DROP TABLE users'
-    cur = conn.cursor()
-    cur.execute(sql)
-    print("Table dropped... ")
-    conn.commit()
-
-
-def create_user(conn, users):
+def insert_users_to_table(conn, users):
   sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
   cur = conn.cursor()
   for columns in people:
@@ -232,9 +217,8 @@ def init_db():
       picture_thumbnail,
       nat
     )
-    user_id = create_user(conn, person)
-    # delete_table(conn)
-    # delete_all_users(conn)
+    user_id = insert_users_to_table(conn, person)
+
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
@@ -250,7 +234,5 @@ def main():
 
   # for r in results:
   #   print(r)  
-  print(args.operation)
-  print(len(people))
 
 main()
