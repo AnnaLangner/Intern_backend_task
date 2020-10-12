@@ -5,7 +5,7 @@ import re
 persons = json.load(open('init/persons.json', encoding='utf-8'))
 
 
-def find_record_with_picture():
+def find_record_with_phone():
   record_names = []
   dict_json_to_list = persons['results']
   for dict_single_record in dict_json_to_list:
@@ -14,7 +14,7 @@ def find_record_with_picture():
   return record_names
 
 
-def clear_the_phone(records):
+def removes_special_characters_from_phone_and_cell_numbers(records):
   for record in records:
     phone = record['phone']       
     clear_phone = re.findall(r'[0-9]', phone)
@@ -28,8 +28,8 @@ def clear_the_phone(records):
 
 
 def main():
-  records = find_record_with_picture()
-  clear_the_phone(records)
+  records = find_record_with_phone()
+  removes_special_characters_from_phone_and_cell_numbers(records)
   
 
 main()
