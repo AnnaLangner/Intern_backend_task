@@ -95,10 +95,10 @@ def init_db(conn):
     print("Error! cannot create the database connection.")
   
 
-def import_users_to_db(conn, unflat_people):
+def import_users_to_db(conn, people_json):
   people = []
 
-  list_of_people = unflat_people['results']
+  list_of_people = people_json['results']
   for dict_of_person in list_of_people:   
     gender = dict_of_person['gender']
     name_title = dict_of_person['name']['title']
@@ -182,12 +182,12 @@ def percentage():
 
 def main():
   results = []
-  unflat_people =  json.load(open("init\persons.json", encoding='utf-8'))
+  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
   if args.operation == 'init':
     init_db(conn)
-    results = import_users_to_db(conn, unflat_people)
+    results = import_users_to_db(conn, people_json)
   elif args.operation == 'percentage':
     results = percentage()
 
