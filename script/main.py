@@ -2,6 +2,7 @@
 import argparse
 import json 
 import sqlite3
+from datetime import datetime
 
 
 def init_argparser():
@@ -19,6 +20,30 @@ def init_argparser():
   parser_percentage.add_argument('--gender', help='Enter female or male')
   args = parser.parse_args()
   return args
+
+
+def find_record_with_dob(people_json):
+  record_names = []
+  dict_json_to_list = people_json['results']
+  for dict_single_record in dict_json_to_list:
+    if 'dob' in dict_single_record:
+      record_names.append(dict_single_record)
+  return record_names
+
+
+def create_new_record_with_dob_in_json(records):
+  for record in records:
+    days_left = 0
+    born = record['dob']['date']
+    date_born_dt = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
+    today = datetime.now().timetuple().tm_yday
+    birthday_day = date_born_dt.timetuple().tm_yday
+    if today > birthday_day:
+      days_left = (365-today)+birthday_day
+    else:
+      days_left = birthday_day - today    
+    dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
+    record["dob"].update(dob_new_record_time_until_birthday)
 
 
 def create_connection(db_file):
@@ -57,6 +82,7 @@ def create_users_table(conn):
     login_sha256 text,
     dob_date text,
     dob_age text,
+    dob_time_until_birthday text,
     registered_date text,
     registered_age text,
     phone text,
@@ -77,7 +103,7 @@ def create_users_table(conn):
 
 
 def insert_users_to_table(conn, users):
-  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
   cur = conn.cursor()
   for columns in users:
@@ -124,6 +150,7 @@ def import_users_to_db(conn, people_json):
     login_sha256 = dict_of_person['login']['sha256']
     dob_date = dict_of_person['dob']['date']
     dob_age = dict_of_person['dob']['age']
+    dob_time_until_birthday = dict_of_person['dob']['time_until_birthday']
     registered_date = dict_of_person['registered']['date']
     registered_age = dict_of_person['registered']['age']
     phone = dict_of_person['phone']
@@ -159,6 +186,7 @@ def import_users_to_db(conn, people_json):
       login_sha256,
       dob_date,
       dob_age,
+      dob_time_until_birthday,
       registered_date,
       registered_age,
       phone,
@@ -185,7 +213,9 @@ def main():
   people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
+  records = find_record_with_dob(people_json)  
   if args.operation == 'init':
+    create_new_record_with_dob_in_json(records)
     init_db(conn)
     results = import_users_to_db(conn, people_json)
   elif args.operation == 'percentage':
