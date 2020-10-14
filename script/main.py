@@ -4,10 +4,6 @@ import json
 import sqlite3
 
 
-JSON_FILE = "init\persons.json"
-unflat_people =  json.load(open(JSON_FILE, encoding='utf-8'))
-
-
 def init_argparser():
   """Fetch arguments from command line"""
 
@@ -35,27 +31,7 @@ def create_connection(db_file):
   return conn
 
 
-def create_table(conn, create_table_sql):
-  try:
-    cursor = conn.cursor()
-    cursor.execute(create_table_sql)
-  except sqlite3.Error as e:
-    print(e)  
-
-
-def insert_users_to_table(conn, users):
-  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
-
-  cur = conn.cursor()
-  for columns in users:
-    cur.execute(sql, columns)  
-  conn.commit()
-
-
-def init_db(conn):  
-  '''Initializing the database'''  
-
-  
+def create_users_table(conn):
   sql_create_users_table = ''' CREATE TABLE IF NOT EXISTS users (
     gender text,
     name_title text,
@@ -93,14 +69,33 @@ def init_db(conn):
     nat
   ); '''  
 
+  try:
+    cursor = conn.cursor()
+    cursor.execute(sql_create_users_table)
+  except sqlite3.Error as e:
+    print(e)  
+
+
+def insert_users_to_table(conn, users):
+  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+
+  cur = conn.cursor()
+  for columns in users:
+    cur.execute(sql, columns)  
+  conn.commit()
+
+
+def init_db(conn):  
+  '''Initializing the database'''    
+
   # create table
   if conn is not None:
-    create_table(conn, sql_create_users_table)
+    create_users_table(conn)
   else:
     print("Error! cannot create the database connection.")
   
 
-def import_users_to_db(conn):
+def import_users_to_db(conn, unflat_people):
   people = []
 
   list_of_people = unflat_people['results']
@@ -187,11 +182,12 @@ def percentage():
 
 def main():
   results = []
+  unflat_people =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
   if args.operation == 'init':
     init_db(conn)
-    results = import_users_to_db(conn)
+    results = import_users_to_db(conn, unflat_people)
   elif args.operation == 'percentage':
     results = percentage()
 
