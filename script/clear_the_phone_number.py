@@ -1,0 +1,35 @@
+import json
+import re
+
+
+persons = json.load(open('init/persons.json', encoding='utf-8'))
+
+
+def find_record_with_phone():
+  record_names = []
+  dict_json_to_list = persons['results']
+  for dict_single_record in dict_json_to_list:
+    if 'phone' and 'cell' in dict_single_record:
+      record_names.append(dict_single_record)
+  return record_names
+
+
+def removes_special_characters_from_phone_and_cell_numbers(records):
+  for record in records:
+    phone = record['phone']       
+    clear_phone = re.findall(r'[0-9]', phone)
+    clear_phone = ''.join(clear_phone)
+    record['phone'] = clear_phone
+
+    cell = record['cell'] 
+    clear_cell = re.findall(r'[0-9]', cell)
+    clear_cell = ''.join(clear_cell)
+    record['cell'] = clear_cell
+
+
+def main():
+  records = find_record_with_phone()
+  removes_special_characters_from_phone_and_cell_numbers(records)
+  
+
+main()
