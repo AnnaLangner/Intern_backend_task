@@ -33,17 +33,19 @@ def find_record_with_dob(people_json):
 
 def create_new_record_with_dob_in_json(records):
   for record in records:
-    days_left = 0
     born = record['dob']['date']
-    date_born_dt = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
-    today = datetime.now().timetuple().tm_yday
-    birthday_day = date_born_dt.timetuple().tm_yday
-    if today > birthday_day:
-      days_left = (365-today)+birthday_day
-    else:
-      days_left = birthday_day - today    
-    dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
-    record["dob"].update(dob_new_record_time_until_birthday)
+    full_date_the_birthday = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
+    date_the_birthday = full_date_the_birthday.date().strftime('%Y, %m, %d')
+    print(type(date_the_birthday))
+    today = date.today().strftime('%Y, %m, %d')
+    print(type(today))
+    today == date.fromtimestamp(time.time())
+    # date_the_birthday = date(today.year, '%m', '%d')
+    # if date_the_birthday < today:
+    #   date_the_birthday = date_the_birthday.replace(year=today.year + 1)
+    # days_left = abs(today - date_the_birthday)
+    # dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
+    # record["dob"].update(dob_new_record_time_until_birthday) 
 
 
 def create_connection(db_file):
