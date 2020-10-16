@@ -1,8 +1,9 @@
 #A script that takes command and parameter as an argument
+import re
 import argparse
 import json 
 import sqlite3
-from datetime import datetime
+from datetime import datetime, date
 
 
 def init_argparser():
@@ -31,8 +32,17 @@ def find_record_with_dob(people_json):
   return record_names
 
 
-def create_new_record_with_dob_in_json(records):
-  for record in records:
+def find_record_with_phone(people_json):
+  record_names = []
+  dict_json_to_list = people_json['results']
+  for dict_single_record in dict_json_to_list:
+    if 'phone' and 'cell' in dict_single_record:
+      record_names.append(dict_single_record)
+  return record_names
+
+
+def create_new_record_with_dob_in_json(dob_records):
+  for record in dob_records:
     born = record['dob']['date']
     full_date_of_birth = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
@@ -43,6 +53,19 @@ def create_new_record_with_dob_in_json(records):
     days_left = abs(date_of_the_nearest_birthday - today).days
     dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
     record["dob"].update(dob_new_record_time_until_birthday)
+
+
+def removes_special_characters_from_phone_and_cell_numbers(phone_records):
+  for record in phone_records:
+    phone = record['phone']       
+    clear_phone = re.findall(r'[0-9]', phone)
+    clear_phone = ''.join(clear_phone)
+    record['phone'] = clear_phone
+
+    cell = record['cell'] 
+    clear_cell = re.findall(r'[0-9]', cell)
+    clear_cell = ''.join(clear_cell)
+    record['cell'] = clear_cell
 
 
 def create_connection(db_file):
@@ -212,9 +235,11 @@ def main():
   people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
-  records = find_record_with_dob(people_json)  
-  if args.operation == 'init':
-    create_new_record_with_dob_in_json(records)
+  dob_records = find_record_with_dob(people_json)  
+  phone_records = find_record_with_phone(people_json)  
+  if args.operation == 'init':  
+    create_new_record_with_dob_in_json(dob_records)
+    removes_special_characters_from_phone_and_cell_numbers(phone_records)
     init_db(conn)
     results = import_users_to_db(conn, people_json)
   elif args.operation == 'percentage':
