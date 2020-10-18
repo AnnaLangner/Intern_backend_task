@@ -23,22 +23,16 @@ def init_argparser():
   return args
 
 
-def find_record_with_dob(people_json):
-  record_names = []
-  dict_json_to_list = people_json['results']
-  for dict_single_record in dict_json_to_list:
-    if 'dob' in dict_single_record:
-      record_names.append(dict_single_record)
-  return record_names
-
-
-def find_record_with_phone(people_json):
-  record_names = []
+def find_records(people_json):
+  record_names_phone = []
+  record_names_with_dob =[]
   dict_json_to_list = people_json['results']
   for dict_single_record in dict_json_to_list:
     if 'phone' and 'cell' in dict_single_record:
-      record_names.append(dict_single_record)
-  return record_names
+      record_names_phone.append(dict_single_record)
+    if 'dob' in dict_single_record:
+      record_names_with_dob.append(dict_single_record)
+  return (record_names_phone, record_names_with_dob)
 
 
 def is_leap_year(year):
@@ -247,8 +241,7 @@ def main():
   people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
-  dob_records = find_record_with_dob(people_json)  
-  phone_records = find_record_with_phone(people_json)  
+  (phone_records, dob_records) = find_records(people_json)  
   if args.operation == 'init':  
     create_new_record_with_dob_in_json(dob_records)
     removes_special_characters_from_phone_and_cell_numbers(phone_records)
