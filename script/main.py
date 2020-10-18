@@ -41,15 +41,27 @@ def find_record_with_phone(people_json):
   return record_names
 
 
+def is_leap_year(year):
+  return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+
 def create_new_record_with_dob_in_json(dob_records):
   for record in dob_records:
     born = record['dob']['date']
     full_date_of_birth = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
     today = date.today()
+    is_leap_year_birthday = False
+    if date_of_birth.month == 2 and date_of_birth.day == 29 and is_leap_year(today.year) == False:
+      is_leap_year_birthday = True
+      date_of_birth = date_of_birth.replace(day=28)
     date_of_the_nearest_birthday = date_of_birth.replace(year=today.year)
     if date_of_the_nearest_birthday < today:
+      if date_of_birth.month == 2 and date_of_birth.day == 29 and is_leap_year(today.year + 1) == False:
+        date_of_birth = date_of_birth.replace(day=28)
       date_of_the_nearest_birthday = date_of_birth.replace(year=today.year +1)
+      if is_leap_year_birthday:
+        date_of_the_nearest_birthday = date_of_the_nearest_birthday.replace(day=29)      
     days_left = abs(date_of_the_nearest_birthday - today).days
     dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
     record["dob"].update(dob_new_record_time_until_birthday)
