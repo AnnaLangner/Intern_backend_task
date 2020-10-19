@@ -56,10 +56,10 @@ def create_new_record_with_dob_in_json(dob_records):
       date_of_the_nearest_birthday = date_of_birth.replace(year=today.year +1)
       if is_leap_year_birthday:
         date_of_the_nearest_birthday = date_of_the_nearest_birthday.replace(day=29)      
-    days_left = abs(date_of_the_nearest_birthday - today).days
-    dob_new_record_time_until_birthday = {"time_until_birthday": str(days_left)}
+    days_left = abs(date_of_the_nearest_birthday - today).days    
+    dob_new_record_time_until_birthday = {"time_until_birthday": days_left}
     record["dob"].update(dob_new_record_time_until_birthday)
-
+  
 
 def removes_special_characters_from_phone_and_cell_numbers(phone_records):
   for record in phone_records:
@@ -110,7 +110,7 @@ def create_users_table(conn):
     login_sha256 text,
     dob_date text,
     dob_age text,
-    dob_time_until_birthday text,
+    dob_time_until_birthday integer,
     registered_date text,
     registered_age text,
     phone text,
