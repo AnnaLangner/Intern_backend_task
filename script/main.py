@@ -1,4 +1,5 @@
 #A script that takes command and parameter as an argument
+import re
 import argparse
 import json 
 import sqlite3
@@ -63,11 +64,11 @@ def create_new_record_with_dob_in_json(dob_records):
 def removes_special_characters_from_phone_and_cell_numbers(phone_records):
   for record in phone_records:
     phone = record['phone']       
-    clear_phone = phone.replace("(", "").replace(")", "").replace("-", "").replace("+", "").replace(" ", "")
+    clear_phone = re.sub(r'\(|\)|\-|\+|\s', '', phone)
     record['phone'] = clear_phone
 
     cell = record['cell'] 
-    clear_cell = cell.replace("(", "").replace(")", "").replace("-", "").replace("+", "").replace(" ", "")
+    clear_cell = re.sub(r'\(|\)|\-|\+|\s', '', cell)
     record['cell'] = clear_cell
 
 
