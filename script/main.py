@@ -141,14 +141,20 @@ def insert_users_to_table(conn, users):
   conn.commit()
 
 
-def init_db(conn):  
+def init_db(conn, people_json):  
   '''Initializing the database'''    
 
   # create table
   if conn is not None:
     create_users_table(conn)
   else:
-    print("Error! cannot create the database connection.")
+    print("Error! cannot create the database connection.")  
+  
+  (phone_records, dob_records) = find_records(people_json)
+  create_new_record_with_dob_in_json(dob_records)
+  removes_special_characters_from_phone_and_cell_numbers(phone_records)
+  remove_record_with_picture_from_json(people_json)
+  import_users_to_db(conn, people_json)
   
 
 def import_users_to_db(conn, people_json):
@@ -236,14 +242,9 @@ def main():
   results = []
   people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
-  args = init_argparser()
-  (phone_records, dob_records) = find_records(people_json)  
+  args = init_argparser()    
   if args.operation == 'init':  
-    create_new_record_with_dob_in_json(dob_records)
-    removes_special_characters_from_phone_and_cell_numbers(phone_records)
-    remove_record_with_picture_from_json(people_json)
-    init_db(conn)
-    results = import_users_to_db(conn, people_json)
+    init_db(conn, people_json)
   elif args.operation == 'percentage':
     results = percentage()
 
