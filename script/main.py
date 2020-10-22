@@ -25,14 +25,17 @@ def init_argparser():
 
 def find_records(people_json):
   record_names_phone = []
-  record_names_with_dob =[]
+  record_names_picture = []
+  record_names_with_dob =[] 
   dict_json_to_list = people_json['results']
   for dict_single_record in dict_json_to_list:
     if 'phone' and 'cell' in dict_single_record:
       record_names_phone.append(dict_single_record)
+    if 'picture' in dict_single_record:
+      record_names_picture.append(dict_single_record)
     if 'dob' in dict_single_record:
       record_names_with_dob.append(dict_single_record)
-  return (record_names_phone, record_names_with_dob)
+  return (record_names_phone, record_names_picture, record_names_with_dob)
 
 
 def is_leap_year(year):
@@ -70,6 +73,11 @@ def removes_special_characters_from_phone_and_cell_numbers(phone_records):
     cell = record['cell'] 
     clear_cell = re.sub(r'\(|\)|\-|\+|\s', '', cell)
     record['cell'] = clear_cell
+
+
+def remove_record_with_picture_from_json(picture_records):
+  for record in picture_records:
+    del record['picture']
 
 
 def create_connection(db_file):
@@ -115,9 +123,6 @@ def create_users_table(conn):
     cell text,
     id_name text,
     id_value text,
-    picture_large text,
-    picture_medium text,
-    picture_thumbnail text,
     nat
   ); '''  
 
@@ -129,7 +134,7 @@ def create_users_table(conn):
 
 
 def insert_users_to_table(conn, users):
-  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
   cur = conn.cursor()
   for columns in users:
@@ -183,9 +188,6 @@ def import_users_to_db(conn, people_json):
     cell = dict_of_person['cell']
     id_name = dict_of_person['id']['name']
     id_value = dict_of_person['id']['value']
-    picture_large = dict_of_person['picture']['large']
-    picture_medium = dict_of_person['picture']['medium']
-    picture_thumbnail = dict_of_person['picture']['thumbnail']
     nat = dict_of_person['nat']
     columns = [
       gender,
@@ -219,9 +221,6 @@ def import_users_to_db(conn, people_json):
       cell,
       id_name,
       id_value,
-      picture_large,
-      picture_medium,
-      picture_thumbnail,
       nat
     ]
 
@@ -239,10 +238,11 @@ def main():
   people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()
-  (phone_records, dob_records) = find_records(people_json)  
+  (phone_records, picture_records, dob_records) = find_records(people_json)  
   if args.operation == 'init':  
     create_new_record_with_dob_in_json(dob_records)
     removes_special_characters_from_phone_and_cell_numbers(phone_records)
+    remove_record_with_picture_from_json(picture_records)
     init_db(conn)
     results = import_users_to_db(conn, people_json)
   elif args.operation == 'percentage':
