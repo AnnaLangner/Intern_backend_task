@@ -141,15 +141,14 @@ def insert_users_to_table(conn, users):
   conn.commit()
 
 
-def init_db(conn, people_json):  
+def init_db(conn):  
   '''Initializing the database'''    
 
   # create table
   if conn is not None:
-    create_users_table(conn)
-  else:
-    print("Error! cannot create the database connection.")  
+    create_users_table(conn)  
   
+  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
   (phone_records, dob_records) = find_records(people_json)
   create_new_record_with_dob_in_json(dob_records)
   removes_special_characters_from_phone_and_cell_numbers(phone_records)
@@ -239,12 +238,11 @@ def percentage():
 
 
 def main():
-  results = []
-  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
+  results = []  
   conn = create_connection('db/pythonsqliteusers.db')
   args = init_argparser()    
   if args.operation == 'init':  
-    init_db(conn, people_json)
+    init_db(conn)
   elif args.operation == 'percentage':
     results = percentage()
 
