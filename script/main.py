@@ -141,21 +141,6 @@ def insert_users_to_table(conn, users):
   conn.commit()
 
 
-def init_db(conn):  
-  '''Initializing the database'''    
-
-  # create table
-  if conn is not None:
-    create_users_table(conn)  
-  
-  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
-  (phone_records, dob_records) = find_records(people_json)
-  create_new_record_with_dob_in_json(dob_records)
-  removes_special_characters_from_phone_and_cell_numbers(phone_records)
-  remove_record_with_picture_from_json(people_json)
-  import_users_to_db(conn, people_json)
-  
-
 def import_users_to_db(conn, people_json):
   people = []
 
@@ -232,6 +217,20 @@ def import_users_to_db(conn, people_json):
     
   insert_users_to_table(conn, people)
 
+
+def init_db(conn):  
+  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
+  (phone_records, dob_records) = find_records(people_json)
+  create_new_record_with_dob_in_json(dob_records)
+  removes_special_characters_from_phone_and_cell_numbers(phone_records)
+  remove_record_with_picture_from_json(people_json)   
+
+  # create table
+  if conn is not None:
+    create_users_table(conn)    
+  
+  import_users_to_db(conn, people_json)
+  
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
