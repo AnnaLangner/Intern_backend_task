@@ -23,7 +23,7 @@ def init_argparser():
   return args
 
 
-def convert_dict_to_list_and_access_to_phone_cell_dob_field(people):
+def convert_dict_to_list_access_phone_cell_dob_field(people):
   field_names_phone = []
   field_names_with_dob =[] 
   dict_json_to_list = people['results']
@@ -39,7 +39,7 @@ def is_leap_year(year):
   return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
-def add_field_that_calculate_how_many_days_left_until_birthday(dob_fields):
+def add_field_time_until_birthday(dob_fields):
   for field in dob_fields:
     born = field['dob']['date']
     full_date_of_birth = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -61,7 +61,7 @@ def add_field_that_calculate_how_many_days_left_until_birthday(dob_fields):
     field["dob"].update(dob_new_field_time_until_birthday)
   
 
-def remove_special_characters_from_phone_and_cell_numbers(phone_fields):
+def remove_special_characters_from_phone_numbers(phone_fields):
   for field in phone_fields:
     phone = field['phone']       
     clear_phone = re.sub(r'\(|\)|\-|\+|\s', '', phone)
@@ -144,85 +144,53 @@ def insert_users_to_table(conn, users):
 def insert_users_to_db(conn, people):
   users = []
 
-  list_of_people = people['results']
-  for dict_of_people in list_of_people:   
-    gender = dict_of_people['gender']
-    name_title = dict_of_people['name']['title']
-    name_first = dict_of_people['name']['first']
-    name_last = dict_of_people['name']['last']
-    location_street_number = dict_of_people['location']['street']['number']
-    location_street_name = dict_of_people['location']['street']['name']
-    location_city = dict_of_people['location']['city']
-    location_state = dict_of_people['location']['state']
-    location_country = dict_of_people['location']['country']
-    location_postcode = dict_of_people['location']['postcode']
-    location_coordinates_latitude = dict_of_people['location']['coordinates']['latitude']
-    location_coordinates_longitude = dict_of_people['location']['coordinates']['longitude']
-    location_timezone_offset = dict_of_people['location']['timezone']['offset']
-    location_timezone_description = dict_of_people['location']['timezone']['description']
-    email = dict_of_people['email']
-    login_uuid = dict_of_people['login']['uuid']
-    login_username = dict_of_people['login']['username']
-    login_password = dict_of_people['login']['password']
-    login_salt = dict_of_people['login']['salt']
-    login_md5 = dict_of_people['login']['md5']
-    login_sha1 = dict_of_people['login']['sha1']
-    login_sha256 = dict_of_people['login']['sha256']
-    dob_date = dict_of_people['dob']['date']
-    dob_age = dict_of_people['dob']['age']
-    dob_time_until_birthday = dict_of_people['dob']['time_until_birthday']
-    registered_date = dict_of_people['registered']['date']
-    registered_age = dict_of_people['registered']['age']
-    phone = dict_of_people['phone']
-    cell = dict_of_people['cell']
-    id_name = dict_of_people['id']['name']
-    id_value = dict_of_people['id']['value']
-    nat = dict_of_people['nat']
-    columns = [
-      gender,
-      name_title,
-      name_first,
-      name_last,
-      location_street_number,
-      location_street_name,
-      location_city,
-      location_state,
-      location_country,
-      location_postcode,
-      location_coordinates_latitude,
-      location_coordinates_longitude,
-      location_timezone_offset,
-      location_timezone_description,
-      email,
-      login_uuid,
-      login_username,
-      login_password,
-      login_salt,
-      login_md5,
-      login_sha1,
-      login_sha256,
-      dob_date,
-      dob_age,
-      dob_time_until_birthday,
-      registered_date,
-      registered_age,
-      phone,
-      cell,
-      id_name,
-      id_value,
-      nat
+  peoples = people['results']
+  for dict_of_person in peoples:      
+    fields = [
+      dict_of_person['gender'],
+      dict_of_person['name']['title'],
+      dict_of_person['name']['first'],
+      dict_of_person['name']['last'],
+      dict_of_person['location']['street']['number'],
+      dict_of_person['location']['street']['name'],
+      dict_of_person['location']['city'],
+      dict_of_person['location']['state'],
+      dict_of_person['location']['country'],
+      dict_of_person['location']['postcode'],
+      dict_of_person['location']['coordinates']['latitude'],
+      dict_of_person['location']['coordinates']['longitude'],
+      dict_of_person['location']['timezone']['offset'],
+      dict_of_person['location']['timezone']['description'],
+      dict_of_person['email'],
+      dict_of_person['login']['uuid'],
+      dict_of_person['login']['username'],
+      dict_of_person['login']['password'],
+      dict_of_person['login']['salt'],
+      dict_of_person['login']['md5'],
+      dict_of_person['login']['sha1'],
+      dict_of_person['login']['sha256'],
+      dict_of_person['dob']['date'],
+      dict_of_person['dob']['age'],
+      dict_of_person['dob']['time_until_birthday'],
+      dict_of_person['registered']['date'],
+      dict_of_person['registered']['age'],
+      dict_of_person['phone'],
+      dict_of_person['cell'],
+      dict_of_person['id']['name'],
+      dict_of_person['id']['value'],
+      dict_of_person['nat'],
     ]
 
-    users.append(columns)      
+    users.append(fields)      
     
   insert_users_to_table(conn, users)
 
 
 def init_db(conn):  
   people =  json.load(open("init\persons.json", encoding='utf-8'))
-  (phone_fields, dob_fields) = convert_dict_to_list_and_access_to_phone_cell_dob_field(people)
-  add_field_that_calculate_how_many_days_left_until_birthday(dob_fields)
-  remove_special_characters_from_phone_and_cell_numbers(phone_fields)
+  (phone_fields, dob_fields) = convert_dict_to_list_access_phone_cell_dob_field(people)
+  add_field_time_until_birthday(dob_fields)
+  remove_special_characters_from_phone_numbers(phone_fields)
   remove_field_with_picture_from_records(people)   
 
   # create table
