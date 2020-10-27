@@ -142,42 +142,42 @@ def insert_users_to_table(conn, users):
 
 
 def insert_users_to_db(conn, people):
-  people = []
+  users = []
 
   list_of_people = people['results']
-  for dict_of_person in list_of_people:   
-    gender = dict_of_person['gender']
-    name_title = dict_of_person['name']['title']
-    name_first = dict_of_person['name']['first']
-    name_last = dict_of_person['name']['last']
-    location_street_number = dict_of_person['location']['street']['number']
-    location_street_name = dict_of_person['location']['street']['name']
-    location_city = dict_of_person['location']['city']
-    location_state = dict_of_person['location']['state']
-    location_country = dict_of_person['location']['country']
-    location_postcode = dict_of_person['location']['postcode']
-    location_coordinates_latitude = dict_of_person['location']['coordinates']['latitude']
-    location_coordinates_longitude = dict_of_person['location']['coordinates']['longitude']
-    location_timezone_offset = dict_of_person['location']['timezone']['offset']
-    location_timezone_description = dict_of_person['location']['timezone']['description']
-    email = dict_of_person['email']
-    login_uuid = dict_of_person['login']['uuid']
-    login_username = dict_of_person['login']['username']
-    login_password = dict_of_person['login']['password']
-    login_salt = dict_of_person['login']['salt']
-    login_md5 = dict_of_person['login']['md5']
-    login_sha1 = dict_of_person['login']['sha1']
-    login_sha256 = dict_of_person['login']['sha256']
-    dob_date = dict_of_person['dob']['date']
-    dob_age = dict_of_person['dob']['age']
-    dob_time_until_birthday = dict_of_person['dob']['time_until_birthday']
-    registered_date = dict_of_person['registered']['date']
-    registered_age = dict_of_person['registered']['age']
-    phone = dict_of_person['phone']
-    cell = dict_of_person['cell']
-    id_name = dict_of_person['id']['name']
-    id_value = dict_of_person['id']['value']
-    nat = dict_of_person['nat']
+  for dict_of_people in list_of_people:   
+    gender = dict_of_people['gender']
+    name_title = dict_of_people['name']['title']
+    name_first = dict_of_people['name']['first']
+    name_last = dict_of_people['name']['last']
+    location_street_number = dict_of_people['location']['street']['number']
+    location_street_name = dict_of_people['location']['street']['name']
+    location_city = dict_of_people['location']['city']
+    location_state = dict_of_people['location']['state']
+    location_country = dict_of_people['location']['country']
+    location_postcode = dict_of_people['location']['postcode']
+    location_coordinates_latitude = dict_of_people['location']['coordinates']['latitude']
+    location_coordinates_longitude = dict_of_people['location']['coordinates']['longitude']
+    location_timezone_offset = dict_of_people['location']['timezone']['offset']
+    location_timezone_description = dict_of_people['location']['timezone']['description']
+    email = dict_of_people['email']
+    login_uuid = dict_of_people['login']['uuid']
+    login_username = dict_of_people['login']['username']
+    login_password = dict_of_people['login']['password']
+    login_salt = dict_of_people['login']['salt']
+    login_md5 = dict_of_people['login']['md5']
+    login_sha1 = dict_of_people['login']['sha1']
+    login_sha256 = dict_of_people['login']['sha256']
+    dob_date = dict_of_people['dob']['date']
+    dob_age = dict_of_people['dob']['age']
+    dob_time_until_birthday = dict_of_people['dob']['time_until_birthday']
+    registered_date = dict_of_people['registered']['date']
+    registered_age = dict_of_people['registered']['age']
+    phone = dict_of_people['phone']
+    cell = dict_of_people['cell']
+    id_name = dict_of_people['id']['name']
+    id_value = dict_of_people['id']['value']
+    nat = dict_of_people['nat']
     columns = [
       gender,
       name_title,
@@ -213,9 +213,9 @@ def insert_users_to_db(conn, people):
       nat
     ]
 
-    people.append(columns)      
+    users.append(columns)      
     
-  insert_users_to_table(conn, people)
+  insert_users_to_table(conn, users)
 
 
 def init_db(conn):  
