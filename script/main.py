@@ -23,25 +23,25 @@ def init_argparser():
   return args
 
 
-def find_records(people_json):
-  record_names_phone = []
-  record_names_with_dob =[] 
-  dict_json_to_list = people_json['results']
-  for dict_single_record in dict_json_to_list:
-    if 'phone' and 'cell' in dict_single_record:
-      record_names_phone.append(dict_single_record)
-    if 'dob' in dict_single_record:
-      record_names_with_dob.append(dict_single_record)
-  return (record_names_phone, record_names_with_dob)
+def convert_dict_to_list_and_access_to_phone_cell_dob_field(people):
+  field_names_phone = []
+  field_names_with_dob =[] 
+  dict_json_to_list = people['results']
+  for dict_single_field in dict_json_to_list:
+    if 'phone' and 'cell' in dict_single_field:
+      field_names_phone.append(dict_single_field)
+    if 'dob' in dict_single_field:
+      field_names_with_dob.append(dict_single_field)
+  return (field_names_phone, field_names_with_dob)
 
 
 def is_leap_year(year):
   return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
-def create_new_record_with_dob_in_json(dob_records):
-  for record in dob_records:
-    born = record['dob']['date']
+def add_field_that_calculate_how_many_days_left_until_birthday(dob_fields):
+  for field in dob_fields:
+    born = field['dob']['date']
     full_date_of_birth = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
     today = date.today()
@@ -57,26 +57,26 @@ def create_new_record_with_dob_in_json(dob_records):
       if is_leap_year_birthday:
         date_of_the_nearest_birthday = date_of_the_nearest_birthday.replace(day=29)      
     days_left = abs(date_of_the_nearest_birthday - today).days    
-    dob_new_record_time_until_birthday = {"time_until_birthday": days_left}
-    record["dob"].update(dob_new_record_time_until_birthday)
+    dob_new_field_time_until_birthday = {"time_until_birthday": days_left}
+    field["dob"].update(dob_new_field_time_until_birthday)
   
 
-def removes_special_characters_from_phone_and_cell_numbers(phone_records):
-  for record in phone_records:
-    phone = record['phone']       
+def remove_special_characters_from_phone_and_cell_numbers(phone_fields):
+  for field in phone_fields:
+    phone = field['phone']       
     clear_phone = re.sub(r'\(|\)|\-|\+|\s', '', phone)
-    record['phone'] = clear_phone
+    field['phone'] = clear_phone
 
-    cell = record['cell'] 
+    cell = field['cell'] 
     clear_cell = re.sub(r'\(|\)|\-|\+|\s', '', cell)
-    record['cell'] = clear_cell
+    field['cell'] = clear_cell
 
 
-def remove_record_with_picture_from_json(people_json):
-  dict_json_to_list = people_json['results']
-  for dict_single_record in dict_json_to_list:
-    if 'picture' in dict_single_record:
-      del dict_single_record['picture']
+def remove_field_with_picture_from_records(people):
+  dict_json_to_list = people['results']
+  for dict_single_field in dict_json_to_list:
+    if 'picture' in dict_single_field:
+      del dict_single_field['picture']
 
 
 def create_connection(db_file):
@@ -141,10 +141,10 @@ def insert_users_to_table(conn, users):
   conn.commit()
 
 
-def import_users_to_db(conn, people_json):
+def insert_users_to_db(conn, people):
   people = []
 
-  list_of_people = people_json['results']
+  list_of_people = people['results']
   for dict_of_person in list_of_people:   
     gender = dict_of_person['gender']
     name_title = dict_of_person['name']['title']
@@ -219,17 +219,17 @@ def import_users_to_db(conn, people_json):
 
 
 def init_db(conn):  
-  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
-  (phone_records, dob_records) = find_records(people_json)
-  create_new_record_with_dob_in_json(dob_records)
-  removes_special_characters_from_phone_and_cell_numbers(phone_records)
-  remove_record_with_picture_from_json(people_json)   
+  people =  json.load(open("init\persons.json", encoding='utf-8'))
+  (phone_fields, dob_fields) = convert_dict_to_list_and_access_to_phone_cell_dob_field(people)
+  add_field_that_calculate_how_many_days_left_until_birthday(dob_fields)
+  remove_special_characters_from_phone_and_cell_numbers(phone_fields)
+  remove_field_with_picture_from_records(people)   
 
   # create table
   if conn is not None:
     create_users_table(conn)    
   
-  import_users_to_db(conn, people_json)
+  insert_users_to_db(conn, people)
   
 
 def percentage():
