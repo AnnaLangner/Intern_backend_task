@@ -23,7 +23,7 @@ def init_argparser():
   return args
 
 
-def convert_dict_to_list_access_phone_cell_dob_field(people):
+def convert_dict_to_list_extract_dob_and_phone_numbers(people):
   field_names_phone = []
   field_names_with_dob =[] 
   dict_json_to_list = people['results']
@@ -70,13 +70,6 @@ def remove_special_characters_from_phone_numbers(phone_fields):
     cell = field['cell'] 
     clear_cell = re.sub(r'\(|\)|\-|\+|\s', '', cell)
     field['cell'] = clear_cell
-
-
-def remove_field_with_picture_from_records(people):
-  dict_json_to_list = people['results']
-  for dict_single_field in dict_json_to_list:
-    if 'picture' in dict_single_field:
-      del dict_single_field['picture']
 
 
 def create_connection(db_file):
@@ -188,10 +181,9 @@ def insert_users_to_db(conn, people):
 
 def init_db(conn):  
   people =  json.load(open("init\persons.json", encoding='utf-8'))
-  (phone_fields, dob_fields) = convert_dict_to_list_access_phone_cell_dob_field(people)
+  (phone_fields, dob_fields) = convert_dict_to_list_extract_dob_and_phone_numbers(people)
   add_field_time_until_birthday(dob_fields)
   remove_special_characters_from_phone_numbers(phone_fields)
-  remove_field_with_picture_from_records(people)   
 
   # create table
   if conn is not None:
