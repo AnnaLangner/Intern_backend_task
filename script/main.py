@@ -23,25 +23,25 @@ def init_argparser():
   return args
 
 
-def find_records(people_json):
-  record_names_phone = []
-  record_names_with_dob =[]
-  dict_json_to_list = people_json['results']
-  for dict_single_record in dict_json_to_list:
-    if 'phone' and 'cell' in dict_single_record:
-      record_names_phone.append(dict_single_record)
-    if 'dob' in dict_single_record:
-      record_names_with_dob.append(dict_single_record)
-  return (record_names_phone, record_names_with_dob)
+def convert_dict_to_list_extract_dob_and_phone_numbers(people):
+  field_names_phone = []
+  field_names_with_dob =[] 
+  dict_json_to_list = people['results']
+  for dict_single_field in dict_json_to_list:
+    if 'phone' and 'cell' in dict_single_field:
+      field_names_phone.append(dict_single_field)
+    if 'dob' in dict_single_field:
+      field_names_with_dob.append(dict_single_field)
+  return (field_names_phone, field_names_with_dob)
 
 
 def is_leap_year(year):
   return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
-def create_new_record_with_dob_in_json(dob_records):
-  for record in dob_records:
-    born = record['dob']['date']
+def add_field_time_until_birthday(dob_fields):
+  for field in dob_fields:
+    born = field['dob']['date']
     full_date_of_birth = datetime.strptime(born, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
     today = date.today()
@@ -57,19 +57,19 @@ def create_new_record_with_dob_in_json(dob_records):
       if is_leap_year_birthday:
         date_of_the_nearest_birthday = date_of_the_nearest_birthday.replace(day=29)      
     days_left = abs(date_of_the_nearest_birthday - today).days    
-    dob_new_record_time_until_birthday = {"time_until_birthday": days_left}
-    record["dob"].update(dob_new_record_time_until_birthday)
+    dob_new_field_time_until_birthday = {"time_until_birthday": days_left}
+    field["dob"].update(dob_new_field_time_until_birthday)
   
 
-def removes_special_characters_from_phone_and_cell_numbers(phone_records):
-  for record in phone_records:
-    phone = record['phone']       
+def remove_special_characters_from_phone_numbers(phone_fields):
+  for field in phone_fields:
+    phone = field['phone']       
     clear_phone = re.sub(r'\(|\)|\-|\+|\s', '', phone)
-    record['phone'] = clear_phone
+    field['phone'] = clear_phone
 
-    cell = record['cell'] 
+    cell = field['cell'] 
     clear_cell = re.sub(r'\(|\)|\-|\+|\s', '', cell)
-    record['cell'] = clear_cell
+    field['cell'] = clear_cell
 
 
 def create_connection(db_file):
@@ -115,9 +115,6 @@ def create_users_table(conn):
     cell text,
     id_name text,
     id_value text,
-    picture_large text,
-    picture_medium text,
-    picture_thumbnail text,
     nat
   ); '''  
 
@@ -129,7 +126,7 @@ def create_users_table(conn):
 
 
 def insert_users_to_table(conn, users):
-  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
+  sql = '''INSERT INTO users VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
   cur = conn.cursor()
   for columns in users:
@@ -137,114 +134,74 @@ def insert_users_to_table(conn, users):
   conn.commit()
 
 
+def insert_users_to_db(conn, people):
+  users = []
+
+  peoples = people['results']
+  for dict_of_person in peoples:      
+    fields = [
+      dict_of_person['gender'],
+      dict_of_person['name']['title'],
+      dict_of_person['name']['first'],
+      dict_of_person['name']['last'],
+      dict_of_person['location']['street']['number'],
+      dict_of_person['location']['street']['name'],
+      dict_of_person['location']['city'],
+      dict_of_person['location']['state'],
+      dict_of_person['location']['country'],
+      dict_of_person['location']['postcode'],
+      dict_of_person['location']['coordinates']['latitude'],
+      dict_of_person['location']['coordinates']['longitude'],
+      dict_of_person['location']['timezone']['offset'],
+      dict_of_person['location']['timezone']['description'],
+      dict_of_person['email'],
+      dict_of_person['login']['uuid'],
+      dict_of_person['login']['username'],
+      dict_of_person['login']['password'],
+      dict_of_person['login']['salt'],
+      dict_of_person['login']['md5'],
+      dict_of_person['login']['sha1'],
+      dict_of_person['login']['sha256'],
+      dict_of_person['dob']['date'],
+      dict_of_person['dob']['age'],
+      dict_of_person['dob']['time_until_birthday'],
+      dict_of_person['registered']['date'],
+      dict_of_person['registered']['age'],
+      dict_of_person['phone'],
+      dict_of_person['cell'],
+      dict_of_person['id']['name'],
+      dict_of_person['id']['value'],
+      dict_of_person['nat'],
+    ]
+
+    users.append(fields)      
+    
+  insert_users_to_table(conn, users)
+
+
 def init_db(conn):  
-  '''Initializing the database'''    
+  people =  json.load(open("init\persons.json", encoding='utf-8'))
+  (phone_fields, dob_fields) = convert_dict_to_list_extract_dob_and_phone_numbers(people)
+  add_field_time_until_birthday(dob_fields)
+  remove_special_characters_from_phone_numbers(phone_fields)
 
   # create table
   if conn is not None:
-    create_users_table(conn)
-  else:
-    print("Error! cannot create the database connection.")
+    create_users_table(conn)    
   
-
-def import_users_to_db(conn, people_json):
-  people = []
-
-  list_of_people = people_json['results']
-  for dict_of_person in list_of_people:   
-    gender = dict_of_person['gender']
-    name_title = dict_of_person['name']['title']
-    name_first = dict_of_person['name']['first']
-    name_last = dict_of_person['name']['last']
-    location_street_number = dict_of_person['location']['street']['number']
-    location_street_name = dict_of_person['location']['street']['name']
-    location_city = dict_of_person['location']['city']
-    location_state = dict_of_person['location']['state']
-    location_country = dict_of_person['location']['country']
-    location_postcode = dict_of_person['location']['postcode']
-    location_coordinates_latitude = dict_of_person['location']['coordinates']['latitude']
-    location_coordinates_longitude = dict_of_person['location']['coordinates']['longitude']
-    location_timezone_offset = dict_of_person['location']['timezone']['offset']
-    location_timezone_description = dict_of_person['location']['timezone']['description']
-    email = dict_of_person['email']
-    login_uuid = dict_of_person['login']['uuid']
-    login_username = dict_of_person['login']['username']
-    login_password = dict_of_person['login']['password']
-    login_salt = dict_of_person['login']['salt']
-    login_md5 = dict_of_person['login']['md5']
-    login_sha1 = dict_of_person['login']['sha1']
-    login_sha256 = dict_of_person['login']['sha256']
-    dob_date = dict_of_person['dob']['date']
-    dob_age = dict_of_person['dob']['age']
-    dob_time_until_birthday = dict_of_person['dob']['time_until_birthday']
-    registered_date = dict_of_person['registered']['date']
-    registered_age = dict_of_person['registered']['age']
-    phone = dict_of_person['phone']
-    cell = dict_of_person['cell']
-    id_name = dict_of_person['id']['name']
-    id_value = dict_of_person['id']['value']
-    picture_large = dict_of_person['picture']['large']
-    picture_medium = dict_of_person['picture']['medium']
-    picture_thumbnail = dict_of_person['picture']['thumbnail']
-    nat = dict_of_person['nat']
-    columns = [
-      gender,
-      name_title,
-      name_first,
-      name_last,
-      location_street_number,
-      location_street_name,
-      location_city,
-      location_state,
-      location_country,
-      location_postcode,
-      location_coordinates_latitude,
-      location_coordinates_longitude,
-      location_timezone_offset,
-      location_timezone_description,
-      email,
-      login_uuid,
-      login_username,
-      login_password,
-      login_salt,
-      login_md5,
-      login_sha1,
-      login_sha256,
-      dob_date,
-      dob_age,
-      dob_time_until_birthday,
-      registered_date,
-      registered_age,
-      phone,
-      cell,
-      id_name,
-      id_value,
-      picture_large,
-      picture_medium,
-      picture_thumbnail,
-      nat
-    ]
-
-    people.append(columns)      
-    
-  insert_users_to_table(conn, people)
-
+  insert_users_to_db(conn, people)
+  
 
 def percentage():
   print('A function summarizing the percentage of women / men in the database')
 
 
 def main():
-  results = []
-  people_json =  json.load(open("init\persons.json", encoding='utf-8'))
+  results = []  
   conn = create_connection('db/pythonsqliteusers.db')
-  args = init_argparser()
-  (phone_records, dob_records) = find_records(people_json)  
+  args = init_argparser()    
   if args.operation == 'init':  
-    create_new_record_with_dob_in_json(dob_records)
-    removes_special_characters_from_phone_and_cell_numbers(phone_records)
     init_db(conn)
-    results = import_users_to_db(conn, people_json)
   elif args.operation == 'percentage':
     results = percentage()
 
