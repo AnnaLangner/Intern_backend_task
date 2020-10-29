@@ -12,10 +12,10 @@ def fetch_arguments():
   parser = argparse.ArgumentParser()
   parser.add_argument('command', help='list of command: init, percentage,average-age, most-popular-cities, most-common-passwords, users-born, most-secure-password')
   # parameter
-  parser.add_argument('--json_file', help='Path to the initial file')
+  parser.add_argument('--file', help='Path to the initial file')
   parser.add_argument('--gender', help='Enter female or male')
   args = parser.parse_args()
-  return (args.command, args.json_file, args.gender)
+  return (args.command, args.file, args.gender)
 
 
 def convert_dict_to_list_extract_dob_and_phone_numbers(people):
@@ -174,8 +174,8 @@ def insert_users_to_db(conn, people):
   insert_users_to_table(conn, users)
 
 
-def init_db(conn, json_file):  
-  people =  json.load(open(json_file , encoding='utf-8'))
+def init_db(conn, file):  
+  people =  json.load(open(file , encoding='utf-8'))
   (phone_fields, dob_fields) = convert_dict_to_list_extract_dob_and_phone_numbers(people)
   add_field_time_until_birthday(dob_fields)
   remove_special_characters_from_phone_numbers(phone_fields)
@@ -215,15 +215,12 @@ def percentage(conn, gender):
   
 
 def main():
-  results = []  
   conn = create_connection('db/pythonsqliteusers.db')
-  (command, json_file, gender) = fetch_arguments()    
+  (command, file, gender) = fetch_arguments()    
   if command == 'init':  
-    init_db(conn, json_file)
+    init_db(conn, file)
   elif command == 'percentage':
-    results = percentage(conn, gender)
+    percentage(conn, gender)
 
-  # for r in results:
-  #   print(r)  
 
 main()
