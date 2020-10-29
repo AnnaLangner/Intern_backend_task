@@ -6,21 +6,16 @@ import sqlite3
 from datetime import datetime, date
 
 
-def init_argparser():
+def fetch_arguments():
   """Fetch arguments from command line"""
 
   parser = argparse.ArgumentParser()
-  subparsers = parser.add_subparsers(help='sub-command help', dest='operation')
-  # create the parser for the init command
-  parser_init = subparsers.add_parser('init', help='init command')
-  # add parameter
-  parser_init.add_argument('--file', help='Path to the initial file')
-  # create the parser for the percentage command
-  parser_percentage = subparsers.add_parser('percentage', help='percent of female or male')
-  # add parameter
-  parser_percentage.add_argument('--gender', help='Enter female or male')
+  parser.add_argument('command', help='list of command: init, percentage,average-age, most-popular-cities, most-common-passwords, users-born, most-secure-password')
+  # parameter
+  parser.add_argument('--json_file', help='Path to the initial file')
+  parser.add_argument('--gender', help='Enter female or male')
   args = parser.parse_args()
-  return args
+  return (args.command, args.json_file, args.gender)
 
 
 def convert_dict_to_list_extract_dob_and_phone_numbers(people):
@@ -179,8 +174,8 @@ def insert_users_to_db(conn, people):
   insert_users_to_table(conn, users)
 
 
-def init_db(conn):  
-  people =  json.load(open("init\persons.json", encoding='utf-8'))
+def init_db(conn, json_file):  
+  people =  json.load(open(json_file , encoding='utf-8'))
   (phone_fields, dob_fields) = convert_dict_to_list_extract_dob_and_phone_numbers(people)
   add_field_time_until_birthday(dob_fields)
   remove_special_characters_from_phone_numbers(phone_fields)
@@ -195,34 +190,38 @@ def init_db(conn):
 def select_all_gender(conn):
   cur = conn.cursor()
   cur.execute("SELECT gender FROM users")
-  gender_row = cur.fetchall()  
-  return gender_row
+  gender_row = cur.fetchall() 
+  gender_list = [i[0] for i in gender_row] 
+  return gender_list
 
 
-def percentage(conn):
-  gender_row = select_all_gender(conn)
-  
+def percentage(conn, gender):
+  gender_list = select_all_gender(conn)  
   male = 0
   female = 0
-  for field in gender_row:
-    if field == ('male',):
+  for item in gender_list:
+    if item == 'male':
       male = male + 1
     else:
       female = female + 1
   percentage_of_women = ((female * 100)/(female + male))
   percentage_of_men = ((male * 100)/(female + male))
-  print(percentage_of_women, percentage_of_men)
-  return percentage_of_men, percentage_of_women
+  if gender == 'male':
+    print('Percentage of men: ' , percentage_of_men, '%')
+  elif gender == 'female':
+    print('Percentage of women: ' , percentage_of_women, '%')
+  else:
+    print('You are entering the wrong gender')
   
 
 def main():
   results = []  
   conn = create_connection('db/pythonsqliteusers.db')
-  args = init_argparser()    
-  if args.operation == 'init':  
-    init_db(conn)
-  elif args.operation == 'percentage':
-    results = percentage(conn)
+  (command, json_file, gender) = fetch_arguments()    
+  if command == 'init':  
+    init_db(conn, json_file)
+  elif command == 'percentage':
+    results = percentage(conn, gender)
 
   # for r in results:
   #   print(r)  
