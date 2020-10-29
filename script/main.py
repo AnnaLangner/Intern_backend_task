@@ -187,16 +187,16 @@ def init_db(conn, file):
   insert_users_to_db(conn, people)
 
 
-def select_all_gender(conn):
+def select_all_gender_and_age(conn):
   cur = conn.cursor()
-  cur.execute("SELECT gender FROM users")
-  gender_row = cur.fetchall() 
-  gender_list = [i[0] for i in gender_row] 
-  return gender_list
+  cur.execute("SELECT gender, dob_age FROM users")
+  gender_rows = cur.fetchall() 
+  return gender_rows
 
 
 def percentage(conn, gender):
-  gender_list = select_all_gender(conn)  
+  gender_rows = select_all_gender_and_age(conn) 
+  gender_list = [i[0] for i in gender_rows]  
   male = 0
   female = 0
   for item in gender_list:
@@ -212,6 +212,32 @@ def percentage(conn, gender):
     print('Percentage of women: ' , percentage_of_women, '%')
   else:
     print('You are entering the wrong gender')
+
+
+def average_age(conn, gender):
+  gender_rows = select_all_gender_and_age(conn)  
+  male = 0
+  female = 0
+  sum_of_age_male = 0
+  sum_of_age_female = 0
+  for item in gender_rows:
+    if item[0] == 'male':
+      male = male + 1
+      sum_of_age_male = sum_of_age_male + int(item[1])
+    else:
+      female = female + 1
+      sum_of_age_female = sum_of_age_female + int(item[1])
+
+  average_age_of_men = int(sum_of_age_male/male)
+  average_age_of_women = int(sum_of_age_female/female)
+  average_age_overall = int((sum_of_age_male + sum_of_age_female)/(male + female))
+
+  if gender == 'male':
+    print('Average age of men: ', average_age_of_men, ' years')
+  elif gender == 'female':
+    print('Average age of women: ', average_age_of_women, ' years')
+  else:
+    print('Overall average age: ', average_age_overall, ' years')
   
 
 def main():
@@ -221,6 +247,8 @@ def main():
     init_db(conn, file)
   elif command == 'percentage':
     percentage(conn, gender)
+  elif command == 'average-age':
+    average_age(conn, gender)
 
 
 main()
