@@ -190,11 +190,30 @@ def init_db(conn):
     create_users_table(conn)    
   
   insert_users_to_db(conn, people)
+
+
+def select_all_gender(conn):
+  cur = conn.cursor()
+  cur.execute("SELECT gender FROM users")
+  gender_row = cur.fetchall()  
+  return gender_row
+
+
+def percentage(conn):
+  gender_row = select_all_gender(conn)
   
-
-def percentage():
-  print('A function summarizing the percentage of women / men in the database')
-
+  male = 0
+  female = 0
+  for field in gender_row:
+    if field == ('male',):
+      male = male + 1
+    else:
+      female = female + 1
+  percentage_of_women = ((female * 100)/(female + male))
+  percentage_of_men = ((male * 100)/(female + male))
+  print(percentage_of_women, percentage_of_men)
+  return percentage_of_men, percentage_of_women
+  
 
 def main():
   results = []  
@@ -203,7 +222,7 @@ def main():
   if args.operation == 'init':  
     init_db(conn)
   elif args.operation == 'percentage':
-    results = percentage()
+    results = percentage(conn)
 
   # for r in results:
   #   print(r)  
