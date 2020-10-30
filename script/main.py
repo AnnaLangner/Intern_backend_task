@@ -189,7 +189,7 @@ def init_db(conn, file):
 
 def select_all_gender_and_age(conn):
   cur = conn.cursor()
-  cur.execute("SELECT gender, dob_age FROM users")
+  cur.execute("SELECT gender, dob_date FROM users")
   gender_rows = cur.fetchall() 
   return gender_rows
 
@@ -215,18 +215,23 @@ def percentage(conn, gender):
 
 
 def average_age(conn, gender):
-  gender_rows = select_all_gender_and_age(conn)  
+  gender_rows = select_all_gender_and_age(conn)    
   male = 0
   female = 0
   sum_of_age_male = 0
   sum_of_age_female = 0
+  
   for item in gender_rows:
+    full_date_of_birth = datetime.strptime(item[1], '%Y-%m-%dT%H:%M:%S.%fZ')
+    date_of_birth = full_date_of_birth.date()
+    today = date.today()
+    age = int((today - date_of_birth).days/365)    
     if item[0] == 'male':
       male = male + 1
-      sum_of_age_male = sum_of_age_male + int(item[1])
+      sum_of_age_male = sum_of_age_male + age
     else:
       female = female + 1
-      sum_of_age_female = sum_of_age_female + int(item[1])
+      sum_of_age_female = sum_of_age_female + age
 
   average_age_of_men = int(sum_of_age_male/male)
   average_age_of_women = int(sum_of_age_female/female)
