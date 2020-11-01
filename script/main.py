@@ -220,12 +220,12 @@ def average_age(conn, gender):
   female = 0
   sum_of_age_male = 0
   sum_of_age_female = 0
-  
+  today = date.today().year
+
   for item in gender_rows:
     full_date_of_birth = datetime.strptime(item[1], '%Y-%m-%dT%H:%M:%S.%fZ')
-    date_of_birth = full_date_of_birth.date()
-    today = date.today()
-    age = int((today - date_of_birth).days/365)    
+    yaer_of_birth = full_date_of_birth.date().year  
+    age = today - yaer_of_birth
     if item[0] == 'male':
       male = male + 1
       sum_of_age_male = sum_of_age_male + age
