@@ -233,16 +233,16 @@ def average_age(conn, gender):
       female = female + 1
       sum_of_age_female = sum_of_age_female + age
 
-  average_age_of_men = int(sum_of_age_male/male)
-  average_age_of_women = int(sum_of_age_female/female)
-  average_age_overall = int((sum_of_age_male + sum_of_age_female)/(male + female))
+  average_age_of_men = float(sum_of_age_male/male)
+  average_age_of_women = float(sum_of_age_female/female)
+  average_age_overall = float((sum_of_age_male + sum_of_age_female)/(male + female))
 
   if gender == 'male':
-    print('Average age of men: ', average_age_of_men, ' years')
+    print('Average age of men: ', round(average_age_of_men, 2), ' years')
   elif gender == 'female':
-    print('Average age of women: ', average_age_of_women, ' years')
+    print('Average age of women: ', round(average_age_of_women, 2), ' years')
   else:
-    print('Overall average age: ', average_age_overall, ' years')
+    print('Overall average age: ', round(average_age_overall, 2), ' years')
   
 
 def main():
