@@ -187,16 +187,16 @@ def init_db(conn, file):
   insert_users_to_db(conn, people)
 
 
-def select_all_gender(conn):
+def select_all_gender_and_age(conn):
   cur = conn.cursor()
-  cur.execute("SELECT gender FROM users")
-  gender_row = cur.fetchall() 
-  gender_list = [i[0] for i in gender_row] 
-  return gender_list
+  cur.execute("SELECT gender, dob_date FROM users")
+  gender_rows = cur.fetchall() 
+  return gender_rows
 
 
 def percentage(conn, gender):
-  gender_list = select_all_gender(conn)  
+  gender_rows = select_all_gender_and_age(conn) 
+  gender_list = [i[0] for i in gender_rows]  
   male = 0
   female = 0
   for item in gender_list:
@@ -212,6 +212,37 @@ def percentage(conn, gender):
     print('Percentage of women: ' , percentage_of_women, '%')
   else:
     print('You are entering the wrong gender')
+
+
+def average_age(conn, gender):
+  gender_rows = select_all_gender_and_age(conn)    
+  male = 0
+  female = 0
+  sum_of_age_male = 0
+  sum_of_age_female = 0
+  today = date.today().year
+
+  for item in gender_rows:
+    full_date_of_birth = datetime.strptime(item[1], '%Y-%m-%dT%H:%M:%S.%fZ')
+    yaer_of_birth = full_date_of_birth.date().year  
+    age = today - yaer_of_birth
+    if item[0] == 'male':
+      male = male + 1
+      sum_of_age_male = sum_of_age_male + age
+    else:
+      female = female + 1
+      sum_of_age_female = sum_of_age_female + age
+
+  average_age_of_men = float(sum_of_age_male/male)
+  average_age_of_women = float(sum_of_age_female/female)
+  average_age_overall = float((sum_of_age_male + sum_of_age_female)/(male + female))
+
+  if gender == 'male':
+    print('Average age of men: {value:.2f} years'.format(value = average_age_of_men))
+  elif gender == 'female':
+    print('Average age of women: {value:.2f} years'.format(value = average_age_of_women))
+  else:
+    print('Overall average age: {value:.2f} years'.format(value = average_age_overall))
   
 
 def main():
@@ -221,6 +252,8 @@ def main():
     init_db(conn, file)
   elif command == 'percentage':
     percentage(conn, gender)
+  elif command == 'average-age':
+    average_age(conn, gender)
 
 
 main()
