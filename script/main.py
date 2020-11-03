@@ -251,12 +251,9 @@ def most_popular_cities(conn, number):
   command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
   cur.execute(command, (number,))
   cities = cur.fetchall()
-  i = 0
-  for i in range(number):
-    city_tuple = cities[i]
-    city_name = city_tuple[0]
-    city_occurrences = city_tuple[1] 
-    i += 1  
+  for city in cities:
+    city_name = city[0]
+    city_occurrences = city[1] 
     print(f'City {city_name} occurr {city_occurrences} times.')
   
 
