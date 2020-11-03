@@ -14,7 +14,7 @@ def fetch_arguments():
   # parameter
   parser.add_argument('--file', help='Path to the initial file')
   parser.add_argument('--gender', help='Enter female or male')
-  parser.add_argument('--number', help='Enter the number of cities to display')
+  parser.add_argument('--number', type=int, help='Enter the number of cities to display')
   args = parser.parse_args()
   return (args.command, args.file, args.gender, args.number)
 
@@ -246,22 +246,18 @@ def average_age(conn, gender):
     print('Overall average age: {value:.2f} years'.format(value = average_age_overall))
 
 
-def select_all_sorted_cities(conn):
-  cur = conn.cursor()
-  cur.execute("SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC")
-  cities = cur.fetchall() 
-  return cities
-
-
 def most_popular_cities(conn, number):
-  cities = select_all_sorted_cities(conn)
+  cur = conn.cursor()
+  command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
+  cur.execute(command, (number,))
+  cities = cur.fetchall()
   i = 0
-  while i < int(number):
+  for i in range(number):
     city_tuple = cities[i]
     city_name = city_tuple[0]
     city_occurrences = city_tuple[1] 
     i += 1  
-    print('City {} occurr {} times'.format(city_name ,city_occurrences))
+    print(f'City {city_name} occurr {city_occurrences} times.')
   
 
 def main():
