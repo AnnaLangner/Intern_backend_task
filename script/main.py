@@ -14,8 +14,9 @@ def fetch_arguments():
   # parameter
   parser.add_argument('--file', help='Path to the initial file')
   parser.add_argument('--gender', help='Enter female or male')
+  parser.add_argument('--number', help='Enter the number of cities to display')
   args = parser.parse_args()
-  return (args.command, args.file, args.gender)
+  return (args.command, args.file, args.gender, args.number)
 
 
 def convert_dict_to_list_extract_dob_and_phone_numbers(people):
@@ -187,7 +188,7 @@ def init_db(conn, file):
   insert_users_to_db(conn, people)
 
 
-def select_all_gender_and_age(conn):
+def select_all_gender_and_dob_date(conn):
   cur = conn.cursor()
   cur.execute("SELECT gender, dob_date FROM users")
   gender_rows = cur.fetchall() 
@@ -195,7 +196,7 @@ def select_all_gender_and_age(conn):
 
 
 def percentage(conn, gender):
-  gender_rows = select_all_gender_and_age(conn) 
+  gender_rows = select_all_gender_and_dob_date(conn) 
   gender_list = [i[0] for i in gender_rows]  
   male = 0
   female = 0
@@ -215,7 +216,7 @@ def percentage(conn, gender):
 
 
 def average_age(conn, gender):
-  gender_rows = select_all_gender_and_age(conn)    
+  gender_rows = select_all_gender_and_dob_date(conn)    
   male = 0
   female = 0
   sum_of_age_male = 0
@@ -243,17 +244,37 @@ def average_age(conn, gender):
     print('Average age of women: {value:.2f} years'.format(value = average_age_of_women))
   else:
     print('Overall average age: {value:.2f} years'.format(value = average_age_overall))
+
+
+def select_all_sorted_cities(conn):
+  cur = conn.cursor()
+  cur.execute("SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC")
+  cities = cur.fetchall() 
+  return cities
+
+
+def most_popular_cities(conn, number):
+  cities = select_all_sorted_cities(conn)
+  i = 0
+  while i < int(number):
+    city_tuple = cities[i]
+    city_name = city_tuple[0]
+    city_occurrences = city_tuple[1] 
+    i += 1  
+    print('City {} occurr {} times'.format(city_name ,city_occurrences))
   
 
 def main():
   conn = create_connection('db/pythonsqliteusers.db')
-  (command, file, gender) = fetch_arguments()    
+  (command, file, gender, number) = fetch_arguments()    
   if command == 'init':  
     init_db(conn, file)
   elif command == 'percentage':
     percentage(conn, gender)
   elif command == 'average-age':
     average_age(conn, gender)
+  elif command == 'most-popular-cities':
+    most_popular_cities(conn, number)
 
 
 main()
