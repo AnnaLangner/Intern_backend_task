@@ -15,8 +15,10 @@ def fetch_arguments():
   parser.add_argument('--file', help='Path to the initial file')
   parser.add_argument('--gender', help='Enter female or male')
   parser.add_argument('--number', type=int, help='Enter the number of cities to display')
+  parser.add_argument('--start-date', type=lambda s: datetime.strptime(s, '%Y-%m-%d'))
+  parser.add_argument('--end-date', type=lambda s: datetime.strptime(s, '%Y-%m-%d'))
   args = parser.parse_args()
-  return (args.command, args.file, args.gender, args.number)
+  return (args.command, args.file, args.gender, args.number, args.start_date, args.end_date)
 
 
 def convert_dict_to_list_extract_dob_and_phone_numbers(people):
@@ -266,11 +268,25 @@ def most_common_passwords(conn, number):
     password_value = password[0]
     password_occurrences = password[1] 
     print(f'Password {password_value} occurr {password_occurrences} times.')
+
+
+def users_born(conn, start_date, end_date):
+  cur = conn.cursor()
+  command = "SELECT name_first, name_last, dob_date FROM users WHERE dob_date BETWEEN ? and ? ORDER BY dob_date ASC"
+  cur.execute(command, (start_date, end_date))
+  users_data = cur.fetchall()
+  for user_data in users_data:
+    user_name = user_data[0]
+    user_last_name = user_data[1]
+    user_date_birth = user_data[2]
+    full_date_of_birth = datetime.strptime(user_date_birth, '%Y-%m-%dT%H:%M:%S.%fZ')
+    date_of_birth = full_date_of_birth.date()
+    print(f'User {user_name} {user_last_name} was born in {date_of_birth}')
   
 
 def main():
   conn = create_connection('db/pythonsqliteusers.db')
-  (command, file, gender, number) = fetch_arguments()    
+  (command, file, gender, number, start_date, end_date) = fetch_arguments()    
   if command == 'init':  
     init_db(conn, file)
   elif command == 'percentage':
@@ -281,6 +297,8 @@ def main():
     most_popular_cities(conn, number)
   elif command == 'most-common-passwords':
     most_common_passwords(conn, number)
+  elif command == 'users-born':
+    users_born(conn, start_date, end_date)
 
 
 main()
