@@ -257,6 +257,17 @@ def most_popular_cities(conn, number):
     print(f'City {city_name} occurr {city_occurrences} times.')
   
 
+def most_common_passwords(conn, number):
+  cur = conn.cursor()
+  command = "SELECT login_password, COUNT(login_password) FROM users GROUP BY login_password ORDER BY COUNT(login_password) DESC limit ?"
+  cur.execute(command, (number,))
+  passwords = cur.fetchall()
+  for password in passwords:
+    password_value = password[0]
+    password_occurrences = password[1] 
+    print(f'Password {password_value} occurr {password_occurrences} times.')
+  
+
 def main():
   conn = create_connection('db/pythonsqliteusers.db')
   (command, file, gender, number) = fetch_arguments()    
@@ -268,6 +279,8 @@ def main():
     average_age(conn, gender)
   elif command == 'most-popular-cities':
     most_popular_cities(conn, number)
+  elif command == 'most-common-passwords':
+    most_common_passwords(conn, number)
 
 
 main()
