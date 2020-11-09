@@ -190,15 +190,15 @@ def init_db(conn, file):
   insert_users_to_db(conn, people)
 
 
-def select_all_gender_and_dob_date_and_password(conn):
+def select_all_gender_and_dob_date(conn):
   cur = conn.cursor()
-  cur.execute("SELECT gender, dob_date, login_password FROM users")
+  cur.execute("SELECT gender, dob_date FROM users")
   gender_rows = cur.fetchall() 
   return gender_rows
 
 
 def percentage(conn, gender):
-  gender_rows = select_all_gender_and_dob_date_and_password(conn) 
+  gender_rows = select_all_gender_and_dob_date(conn) 
   gender_list = [i[0] for i in gender_rows]  
   male = 0
   female = 0
@@ -218,7 +218,7 @@ def percentage(conn, gender):
 
 
 def average_age(conn, gender):
-  gender_rows = select_all_gender_and_dob_date_and_password(conn)    
+  gender_rows = select_all_gender_and_dob_date(conn)    
   male = 0
   female = 0
   sum_of_age_male = 0
@@ -285,7 +285,14 @@ def users_born(conn, start_date, end_date):
 
 
 def most_secure_password(conn):
-  passwords_list =  [i[2] for i in select_all_gender_and_dob_date_and_password(conn)]  
+  cur = conn.cursor()
+  command = 'SELECT login_password FROM users'
+  cur.execute(command)
+  passwords_tuple = cur.fetchall()
+  passwords_list = []
+  for item in passwords_tuple:
+    passwords_list.append(item[0])
+
   password_and_score_tuple_list = []
   for password in passwords_list:
     total = 0
@@ -299,11 +306,11 @@ def most_secure_password(conn):
       total += 1
     if any(not letter.isalnum() for letter in password):
       total += 3
-
+    
     password_and_score_tuple_list.append(tuple((password, total)))
     
-  sorted_by_score = sorted(password_and_score_tuple_list, key=lambda tup: tup[1], reverse=True)
-  for result in sorted_by_score:
+    
+  for result in password_and_score_tuple_list:
     if result[1] >= 7:
       print(f'This password: {result[0]} it is secure, get {result[1]} points')
 
