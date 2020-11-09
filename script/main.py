@@ -307,7 +307,7 @@ def most_secure_password(conn):
     if any(not letter.isalnum() for letter in password):
       total += 3
     
-    password_and_score_tuple_list.append(tuple((password, total)))
+    password_and_score_tuple_list.append((password, total))
     
     
   for result in password_and_score_tuple_list:
