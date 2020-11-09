@@ -190,15 +190,15 @@ def init_db(conn, file):
   insert_users_to_db(conn, people)
 
 
-def select_all_gender_and_dob_date(conn):
+def select_all_gender_and_dob_date_and_password(conn):
   cur = conn.cursor()
-  cur.execute("SELECT gender, dob_date FROM users")
+  cur.execute("SELECT gender, dob_date, login_password FROM users")
   gender_rows = cur.fetchall() 
   return gender_rows
 
 
 def percentage(conn, gender):
-  gender_rows = select_all_gender_and_dob_date(conn) 
+  gender_rows = select_all_gender_and_dob_date_and_password(conn) 
   gender_list = [i[0] for i in gender_rows]  
   male = 0
   female = 0
@@ -218,7 +218,7 @@ def percentage(conn, gender):
 
 
 def average_age(conn, gender):
-  gender_rows = select_all_gender_and_dob_date(conn)    
+  gender_rows = select_all_gender_and_dob_date_and_password(conn)    
   male = 0
   female = 0
   sum_of_age_male = 0
@@ -282,7 +282,31 @@ def users_born(conn, start_date, end_date):
     full_date_of_birth = datetime.strptime(user_date_birth, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
     print(f'User {user_name} {user_last_name} was born in {date_of_birth}')
-  
+
+
+def most_secure_password(conn):
+  passwords_list =  [i[2] for i in select_all_gender_and_dob_date_and_password(conn)]  
+  password_and_score_tuple_list = []
+  for password in passwords_list:
+    total = 0
+    if len(password) >= 8:
+      total += 5      
+    if any(letter.isupper() for letter in password):
+      total += 2
+    if any(letter.islower() for letter in password):
+      total += 1
+    if any(letter.isdigit() for letter in password):
+      total += 1
+    if any(not letter.isalnum() for letter in password):
+      total += 3
+
+    password_and_score_tuple_list.append(tuple((password, total)))
+    
+  sorted_by_score = sorted(password_and_score_tuple_list, key=lambda tup: tup[1], reverse=True)
+  for result in sorted_by_score:
+    if result[1] >= 7:
+      print(f'This password: {result[0]} it is secure, get {result[1]} points')
+
 
 def main():
   conn = create_connection('db/pythonsqliteusers.db')
@@ -299,6 +323,8 @@ def main():
     most_common_passwords(conn, number)
   elif command == 'users-born':
     users_born(conn, start_date, end_date)
+  elif command == 'most-secure-password':
+    most_secure_password(conn)
 
 
 main()
