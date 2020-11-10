@@ -282,7 +282,38 @@ def users_born(conn, start_date, end_date):
     full_date_of_birth = datetime.strptime(user_date_birth, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
     print(f'User {user_name} {user_last_name} was born in {date_of_birth}')
-  
+
+
+def most_secure_password(conn):
+  cur = conn.cursor()
+  command = 'SELECT login_password FROM users'
+  cur.execute(command)
+  passwords_tuple = cur.fetchall()
+  passwords_list = []
+  for item in passwords_tuple:
+    passwords_list.append(item[0])
+
+  password_and_score_tuple_list = []
+  for password in passwords_list:
+    total = 0
+    if len(password) >= 8:
+      total += 5      
+    if any(letter.isupper() for letter in password):
+      total += 2
+    if any(letter.islower() for letter in password):
+      total += 1
+    if any(letter.isdigit() for letter in password):
+      total += 1
+    if any(not letter.isalnum() for letter in password):
+      total += 3
+    
+    password_and_score_tuple_list.append((password, total))
+    
+    
+  for result in password_and_score_tuple_list:
+    if result[1] >= 7:
+      print(f'This password: {result[0]} it is secure, get {result[1]} points')
+
 
 def main():
   conn = create_connection('db/pythonsqliteusers.db')
@@ -299,6 +330,8 @@ def main():
     most_common_passwords(conn, number)
   elif command == 'users-born':
     users_born(conn, start_date, end_date)
+  elif command == 'most-secure-password':
+    most_secure_password(conn)
 
 
 main()
