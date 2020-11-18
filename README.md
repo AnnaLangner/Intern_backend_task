@@ -46,7 +46,11 @@ This project help you in easy way to pull up information about users in your dat
 
 *If You want to run tests:*
 
+* You must be in your scripts folder,
+
 * **python -m unittest -v main_test.TestDigitAddition**, Run a sample test
+
+* **python -m unittest main_test.TestRemovesSpecialCharacters**, Run a test of correct removal of special characters from phone numbers
 
   
 
