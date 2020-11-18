@@ -40,6 +40,14 @@ This project help you in easy way to pull up information about users in your dat
 
 * **python script/main.py most-secure-password**, returns the most secure password from the database.
 
+
+
+### Testing
+
+*If You want to run tests:*
+
+* **python -m unittest -v main_test.TestDigitAddition**, Run a sample test
+
   
 
 ### Technologies
