@@ -59,16 +59,16 @@ def add_field_time_until_birthday(dob_fields):
     field["dob"].update(dob_new_field_time_until_birthday)
   
 
-def clear_phone_numbers(phone):
+def clear_phone_number(phone):
   clear_phone = re.sub(r'\(|\)|\-|\+|\s', '', phone)
   return clear_phone
 
 
 def remove_special_characters_from_phone_numbers(phone_fields):
   for field in phone_fields:     
-    field['phone'] = clear_phone_numbers(field['phone'])
+    field['phone'] = clear_phone_number(field['phone'])
     
-    field['cell'] = clear_phone_numbers(field['cell'])
+    field['cell'] = clear_phone_number(field['cell'])
 
 def create_connection(db_file):
   conn = None
