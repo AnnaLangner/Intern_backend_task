@@ -65,12 +65,10 @@ def clear_phone_numbers(phone):
 
 
 def remove_special_characters_from_phone_numbers(phone_fields):
-  for field in phone_fields:
-    phone = field['phone']        
-    field['phone'] = clear_phone_numbers(phone)
-
-    cell = field['cell']     
-    field['cell'] = clear_phone_numbers(cell)
+  for field in phone_fields:     
+    field['phone'] = clear_phone_numbers(field['phone'])
+    
+    field['cell'] = clear_phone_numbers(field['cell'])
 
 def create_connection(db_file):
   conn = None
