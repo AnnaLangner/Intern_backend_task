@@ -24,15 +24,6 @@ class TestRemovesSpecialCharacters(unittest.TestCase):
     self.assertEqual(main.clear_phone_numbers("0456188834"),"0456188834")
     self.assertEqual(main.clear_phone_numbers("0674931475"),"0674931475") 
 
-    self.assertEqual(main.clear_phone_numbers("0758316855"),"0758316855")
-    self.assertEqual(main.clear_phone_numbers("0752922227"),"0752922227")
-
-    self.assertEqual(main.clear_phone_numbers("3943816746"),"3943816746")
-    self.assertEqual(main.clear_phone_numbers("3613568993"),"3613568993")
-
-    self.assertEqual(main.clear_phone_numbers("0011700136"),"0011700136")
-    self.assertEqual(main.clear_phone_numbers("3273676536"),"3273676536")
-
 
 if __name__ == '__main__':
     unittest.main()
