@@ -31,4 +31,4 @@ db/
 
 
 # pycache
-__pycache__
+script/__pycache__

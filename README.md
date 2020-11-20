@@ -46,7 +46,9 @@ This project help you in easy way to pull up information about users in your dat
 
 *If You want to run tests:*
 
-* **python -m unittest -v main_test.TestDigitAddition**, Run a sample test
+* You must be in your scripts folder,
+
+* **python -m unittest main_test.py**, Run all tests
 
   
 
