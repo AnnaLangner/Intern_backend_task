@@ -25,5 +25,17 @@ class TestRemovesSpecialCharacters(unittest.TestCase):
     self.assertEqual(main.clear_phone_numbers("0674931475"),"0674931475") 
 
 
+class TestIsLeapYear(unittest.TestCase):
+
+  def test_is_leap_year(self):
+    self.assertTrue(main.is_leap_year(400), True)
+    self.assertTrue(main.is_leap_year(1960), True)
+    self.assertTrue(main.is_leap_year(2000), True)
+    self.assertTrue(main.is_leap_year(2020), True)
+    self.assertTrue(main.is_leap_year(2024), True)
+
+  def test_is_not_leap_year(self):
+    self.assertFalse(main.is_leap_year(100), True)
+
 if __name__ == '__main__':
     unittest.main()
