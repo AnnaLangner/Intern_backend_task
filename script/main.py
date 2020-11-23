@@ -248,33 +248,45 @@ def average_age(conn, gender):
     print('Overall average age: {value:.2f} years'.format(value = average_age_overall))
 
 
-def most_popular_cities(conn, number):
+def all_cities(conn, number):
   cur = conn.cursor()
   command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
   cur.execute(command, (number,))
   cities = cur.fetchall()
+  return cities
+
+
+def most_popular_cities(cities):
   for city in cities:
     city_name = city[0]
     city_occurrences = city[1] 
     print(f'City {city_name} occurr {city_occurrences} times.')
   
 
-def most_common_passwords(conn, number):
+def all_passwords(conn, number):
   cur = conn.cursor()
   command = "SELECT login_password, COUNT(login_password) FROM users GROUP BY login_password ORDER BY COUNT(login_password) DESC limit ?"
   cur.execute(command, (number,))
   passwords = cur.fetchall()
+  return passwords
+
+
+def most_common_passwords(passwords):
   for password in passwords:
     password_value = password[0]
     password_occurrences = password[1] 
     print(f'Password {password_value} occurr {password_occurrences} times.')
 
 
-def users_born(conn, start_date, end_date):
+def data_of_born_users(conn, start_date, end_date):
   cur = conn.cursor()
   command = "SELECT name_first, name_last, dob_date FROM users WHERE dob_date BETWEEN ? and ? ORDER BY dob_date ASC"
   cur.execute(command, (start_date, end_date))
-  users_data = cur.fetchall()
+  users_data = cur.fetchall()  
+  return users_data
+
+
+def users_born(users_data):
   for user_data in users_data:
     user_name = user_data[0]
     user_last_name = user_data[1]
@@ -284,7 +296,7 @@ def users_born(conn, start_date, end_date):
     print(f'User {user_name} {user_last_name} was born in {date_of_birth}')
 
 
-def most_secure_password(conn):
+def passwords_tuples_list(conn):
   cur = conn.cursor()
   command = 'SELECT login_password FROM users'
   cur.execute(command)
@@ -309,7 +321,10 @@ def most_secure_password(conn):
     
     password_and_score_tuple_list.append((password, total))
     
+  return password_and_score_tuple_list
     
+
+def most_secure_password(password_and_score_tuple_list):
   for result in password_and_score_tuple_list:
     if result[1] >= 7:
       print(f'This password: {result[0]} it is secure, get {result[1]} points')
@@ -325,13 +340,17 @@ def main():
   elif command == 'average-age':
     average_age(conn, gender)
   elif command == 'most-popular-cities':
-    most_popular_cities(conn, number)
+    cities = all_cities(conn, number)
+    most_popular_cities(cities)
   elif command == 'most-common-passwords':
-    most_common_passwords(conn, number)
+    passwords = all_passwords(conn, number)
+    most_common_passwords(passwords)
   elif command == 'users-born':
-    users_born(conn, start_date, end_date)
+    users_data = data_of_born_users(conn, start_date, end_date)
+    users_born(users_data)
   elif command == 'most-secure-password':
-    most_secure_password(conn)
+    password_and_score_tuple_list = passwords_tuples_list(conn)
+    most_secure_password(password_and_score_tuple_list)
 
 
 if __name__ == "__main__":
