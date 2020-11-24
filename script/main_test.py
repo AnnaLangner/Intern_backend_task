@@ -15,10 +15,13 @@ def create_connection(db_file):
 
 class TestMostPopularCities(unittest.TestCase):
 
+  def setUp(self):
+    self.connection = create_connection("../db/pythonsqliteusers.db")
+
   def test_most_popular_cities(self):
-    self.assertEqual(len(main.most_popular_cities(create_connection("../db/pythonsqliteusers.db"), 5)), 5)
-    self.assertEqual(len(main.most_popular_cities(create_connection("../db/pythonsqliteusers.db"), 3)), 3)
-    self.assertEqual(len(main.most_popular_cities(create_connection("../db/pythonsqliteusers.db"), 10)), 10)
+    self.assertEqual(len(main.most_popular_cities(self.connection, 5)), 5)
+    self.assertEqual(len(main.most_popular_cities(self.connection, 3)), 3)
+    self.assertEqual(len(main.most_popular_cities(self.connection, 10)), 10)
 
 
 class TestRemovesSpecialCharacters(unittest.TestCase):
@@ -60,4 +63,3 @@ class TestIsLeapYear(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    
