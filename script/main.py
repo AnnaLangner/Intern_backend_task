@@ -252,11 +252,9 @@ def most_popular_cities(conn, number):
   cur = conn.cursor()
   command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
   cur.execute(command, (number,))
-  cities = cur.fetchall()
-  for city in cities:
-    city_name = city[0]
-    city_occurrences = city[1] 
-    print(f'City {city_name} occurr {city_occurrences} times.')
+  cities = cur.fetchall()  
+  cities_list = [(city[0], city[1]) for city in cities]
+  return cities_list
   
 
 def most_common_passwords(conn, number):
@@ -264,34 +262,32 @@ def most_common_passwords(conn, number):
   command = "SELECT login_password, COUNT(login_password) FROM users GROUP BY login_password ORDER BY COUNT(login_password) DESC limit ?"
   cur.execute(command, (number,))
   passwords = cur.fetchall()
-  for password in passwords:
-    password_value = password[0]
-    password_occurrences = password[1] 
-    print(f'Password {password_value} occurr {password_occurrences} times.')
+  passwords_list = [(password[0], password[1]) for password in passwords]
+  return passwords_list  
 
 
 def users_born(conn, start_date, end_date):
   cur = conn.cursor()
   command = "SELECT name_first, name_last, dob_date FROM users WHERE dob_date BETWEEN ? and ? ORDER BY dob_date ASC"
   cur.execute(command, (start_date, end_date))
-  users_data = cur.fetchall()
+  users_data = cur.fetchall() 
+  user_data_list = []
   for user_data in users_data:
     user_name = user_data[0]
     user_last_name = user_data[1]
     user_date_birth = user_data[2]
     full_date_of_birth = datetime.strptime(user_date_birth, '%Y-%m-%dT%H:%M:%S.%fZ')
     date_of_birth = full_date_of_birth.date()
-    print(f'User {user_name} {user_last_name} was born in {date_of_birth}')
+    user_data_list.append((user_name, user_last_name, date_of_birth))
+  return user_data_list
 
 
-def most_secure_password(conn):
+def most_secure_passwords(conn):
   cur = conn.cursor()
   command = 'SELECT login_password FROM users'
   cur.execute(command)
   passwords_tuple = cur.fetchall()
-  passwords_list = []
-  for item in passwords_tuple:
-    passwords_list.append(item[0])
+  passwords_list = [item[0] for item in passwords_tuple]
 
   password_and_score_tuple_list = []
   for password in passwords_list:
@@ -306,13 +302,10 @@ def most_secure_password(conn):
       total += 1
     if any(not letter.isalnum() for letter in password):
       total += 3
+    if total >= 7:
+      password_and_score_tuple_list.append((password, total))
     
-    password_and_score_tuple_list.append((password, total))
-    
-    
-  for result in password_and_score_tuple_list:
-    if result[1] >= 7:
-      print(f'This password: {result[0]} it is secure, get {result[1]} points')
+  return password_and_score_tuple_list  
 
 
 def main():
@@ -325,13 +318,21 @@ def main():
   elif command == 'average-age':
     average_age(conn, gender)
   elif command == 'most-popular-cities':
-    most_popular_cities(conn, number)
+    cities_list = most_popular_cities(conn, number)
+    for result in cities_list:
+      print(f'City {result[0]} occurr {result[1]} times.')
   elif command == 'most-common-passwords':
-    most_common_passwords(conn, number)
+    passwords_list = most_common_passwords(conn, number)
+    for result in passwords_list:
+      print(f'Password {result[0]} occurr {result[1]} times.')
   elif command == 'users-born':
-    users_born(conn, start_date, end_date)
+    users_data = users_born(conn, start_date, end_date)
+    for user_data in users_data:
+      print(f'User {user_data[0]} {user_data[1]} was born in {user_data[2]}')
   elif command == 'most-secure-password':
-    most_secure_password(conn)
+    password_and_score_tuple_list = most_secure_passwords(conn)
+    for result in password_and_score_tuple_list:
+      print(f'This password: {result[0]} it is secure, get {result[1]} points')
 
 
 if __name__ == "__main__":
