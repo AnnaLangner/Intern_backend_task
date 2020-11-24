@@ -253,11 +253,7 @@ def most_popular_cities(conn, number):
   command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
   cur.execute(command, (number,))
   cities = cur.fetchall()  
-  cities_list = []
-  for city in cities:
-      city_name = city[0]
-      city_occurrences = city[1] 
-      cities_list.append((city_name, city_occurrences))
+  cities_list = [(city[0], city[1]) for city in cities]
   return cities_list
   
 
@@ -266,11 +262,7 @@ def most_common_passwords(conn, number):
   command = "SELECT login_password, COUNT(login_password) FROM users GROUP BY login_password ORDER BY COUNT(login_password) DESC limit ?"
   cur.execute(command, (number,))
   passwords = cur.fetchall()
-  passwords_list = []
-  for password in passwords:
-    password_value = password[0]
-    password_occurrences = password[1]
-    passwords_list.append((password_value, password_occurrences))
+  passwords_list = [(password[0], password[1]) for password in passwords]
   return passwords_list  
 
 
@@ -295,9 +287,7 @@ def most_secure_passwords(conn):
   command = 'SELECT login_password FROM users'
   cur.execute(command)
   passwords_tuple = cur.fetchall()
-  passwords_list = []
-  for item in passwords_tuple:
-    passwords_list.append(item[0])
+  passwords_list = [item[0] for item in passwords_tuple]
 
   password_and_score_tuple_list = []
   for password in passwords_list:
