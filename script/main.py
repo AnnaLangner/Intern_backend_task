@@ -253,7 +253,12 @@ def most_popular_cities(conn, number):
   command = "SELECT location_city, count(location_city) FROM users GROUP BY location_city ORDER BY count(location_city) DESC LIMIT ?"
   cur.execute(command, (number,))
   cities = cur.fetchall()  
-  return cities
+  cities_list = []
+  for city in cities:
+      city_name = city[0]
+      city_occurrences = city[1] 
+      cities_list.append((city_name, city_occurrences))
+  return cities_list
   
 
 def most_common_passwords(conn, number):
@@ -261,7 +266,12 @@ def most_common_passwords(conn, number):
   command = "SELECT login_password, COUNT(login_password) FROM users GROUP BY login_password ORDER BY COUNT(login_password) DESC limit ?"
   cur.execute(command, (number,))
   passwords = cur.fetchall()
-  return passwords  
+  passwords_list = []
+  for password in passwords:
+    password_value = password[0]
+    password_occurrences = password[1]
+    passwords_list.append((password_value, password_occurrences))
+  return passwords_list  
 
 
 def users_born(conn, start_date, end_date):
@@ -318,17 +328,13 @@ def main():
   elif command == 'average-age':
     average_age(conn, gender)
   elif command == 'most-popular-cities':
-    cities = most_popular_cities(conn, number)
-    for city in cities:
-      city_name = city[0]
-      city_occurrences = city[1] 
-      print(f'City {city_name} occurr {city_occurrences} times.')
+    cities_list = most_popular_cities(conn, number)
+    for result in cities_list:
+      print(f'City {result[0]} occurr {result[1]} times.')
   elif command == 'most-common-passwords':
-    passwords = most_common_passwords(conn, number)
-    for password in passwords:
-      password_value = password[0]
-      password_occurrences = password[1] 
-      print(f'Password {password_value} occurr {password_occurrences} times.')
+    passwords_list = most_common_passwords(conn, number)
+    for result in passwords_list:
+      print(f'Password {result[0]} occurr {result[1]} times.')
   elif command == 'users-born':
     users_data = users_born(conn, start_date, end_date)
     for user_data in users_data:
