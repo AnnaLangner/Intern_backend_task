@@ -23,6 +23,9 @@ class TestMostPopularCities(unittest.TestCase):
     self.assertEqual(len(main.most_popular_cities(self.connection, 3)), 3)
     self.assertEqual(len(main.most_popular_cities(self.connection, 10)), 10)
 
+  def tearDown(self):
+    self.connection.close()
+
 
 class TestRemovesSpecialCharacters(unittest.TestCase):
 
