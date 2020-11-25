@@ -13,7 +13,7 @@ def create_connection(db_file):
   return conn
 
 
-class TestMostPopularCities(unittest.TestCase):
+class TestFunctionsRetrievingDataFromTheDatabase(unittest.TestCase):
 
   def setUp(self):
     self.connection = create_connection("../db/pythonsqliteusers.db")
@@ -23,19 +23,18 @@ class TestMostPopularCities(unittest.TestCase):
     self.assertEqual(len(main.most_popular_cities(self.connection, 3)), 3)
     self.assertEqual(len(main.most_popular_cities(self.connection, 10)), 10)
 
-  def tearDown(self):
-    self.connection.close()
-
-
-class TestMostCommonPasswords(unittest.TestCase):
-
-  def setUp(self):
-    self.connection = create_connection("../db/pythonsqliteusers.db")
-
   def test_most_common_passwords(self):
     self.assertEqual(len(main.most_common_passwords(self.connection, 5)), 5)
     self.assertEqual(len(main.most_common_passwords(self.connection, 3)), 3)
     self.assertEqual(len(main.most_common_passwords(self.connection, 10)), 10)
+
+  def test_users_born(self):
+    self.assertEqual(len(main.users_born(self.connection, '1944-01-01', '1999-01-01')), 1000)
+    self.assertEqual(len(main.users_born(self.connection, '1960-01-01', '1965-01-01')), 92)
+    self.assertEqual(len(main.users_born(self.connection, '1990-05-11', '1991-06-10')), 21)
+
+  def test_most_secure_passwords(self):
+    self.assertEqual(len(main.most_secure_passwords(self.connection)), 29)
 
   def tearDown(self):
     self.connection.close()
