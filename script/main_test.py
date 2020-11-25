@@ -27,6 +27,20 @@ class TestMostPopularCities(unittest.TestCase):
     self.connection.close()
 
 
+class TestMostCommonPasswords(unittest.TestCase):
+
+  def setUp(self):
+    self.connection = create_connection("../db/pythonsqliteusers.db")
+
+  def test_most_common_passwords(self):
+    self.assertEqual(len(main.most_common_passwords(self.connection, 5)), 5)
+    self.assertEqual(len(main.most_common_passwords(self.connection, 3)), 3)
+    self.assertEqual(len(main.most_common_passwords(self.connection, 10)), 10)
+
+  def tearDown(self):
+    self.connection.close()
+
+
 class TestRemovesSpecialCharacters(unittest.TestCase):
 
   def test_remove_special_characters(self):
