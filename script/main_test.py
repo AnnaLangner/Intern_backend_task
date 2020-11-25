@@ -1,5 +1,30 @@
 import unittest
 import main
+import sqlite3
+
+
+def create_connection(db_file):
+  conn = None
+  try:
+    conn = sqlite3.connect(db_file)
+  except sqlite3.Error as e:
+    print(e)
+  
+  return conn
+
+
+class TestMostPopularCities(unittest.TestCase):
+
+  def setUp(self):
+    self.connection = create_connection("../db/pythonsqliteusers.db")
+
+  def test_most_popular_cities(self):
+    self.assertEqual(len(main.most_popular_cities(self.connection, 5)), 5)
+    self.assertEqual(len(main.most_popular_cities(self.connection, 3)), 3)
+    self.assertEqual(len(main.most_popular_cities(self.connection, 10)), 10)
+
+  def tearDown(self):
+    self.connection.close()
 
 
 class TestRemovesSpecialCharacters(unittest.TestCase):
@@ -37,6 +62,7 @@ class TestIsLeapYear(unittest.TestCase):
   def test_is_not_leap_year(self):
     self.assertFalse(main.is_leap_year(100), True)
     self.assertFalse(main.is_leap_year(2007), True)
+
 
 if __name__ == '__main__':
     unittest.main()
