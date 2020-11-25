@@ -41,6 +41,18 @@ class TestMostCommonPasswords(unittest.TestCase):
     self.connection.close()
 
 
+class TestMostSecurePasswords(unittest.TestCase):
+
+  def setUp(self):
+    self.connection = create_connection("../db/pythonsqliteusers.db")
+
+  def test_most_secure_passwords(self):
+    self.assertEqual(len(main.most_secure_passwords(self.connection)), 29)
+
+  def tearDown(self):
+    self.connection.close()
+
+
 class TestRemovesSpecialCharacters(unittest.TestCase):
 
   def test_remove_special_characters(self):
