@@ -61,7 +61,3 @@ This project help you in easy way to pull up information about users in your dat
 * Python 3.7
 
 * SQLite
-
-  
-
-### Setup
